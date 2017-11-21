@@ -1,0 +1,14 @@
+{
+    "name": "ArduboyAdvance",
+    "keywords": "arduboy, game",
+    "description": "An ARM Arduboy library",
+    "repository":
+    {
+        "type": "git",
+        "url": "https://github.com/t21/ArduboyAdvance.git"
+    },
+    "version": "0.1.0",
+    "exclude": "extras",
+    "frameworks": "arduino",
+    "platforms": "atmelavr"
+}
