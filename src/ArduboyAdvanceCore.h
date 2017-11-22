@@ -71,12 +71,18 @@
 
 // bit values for button states
 // these are determined by the buttonsState() function
-#define LEFT_BUTTON _BV(5)  /**< The Left button value for functions requiring a bitmask */
-#define RIGHT_BUTTON _BV(6) /**< The Right button value for functions requiring a bitmask */
-#define UP_BUTTON _BV(7)    /**< The Up button value for functions requiring a bitmask */
-#define DOWN_BUTTON _BV(4)  /**< The Down button value for functions requiring a bitmask */
-#define A_BUTTON _BV(3)     /**< The A button value for functions requiring a bitmask */
-#define B_BUTTON _BV(2)     /**< The B button value for functions requiring a bitmask */
+#define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
+// #define LEFT_BUTTON _BV(5)  /**< The Left button value for functions requiring a bitmask */
+#define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
+// #define RIGHT_BUTTON _BV(6) /**< The Right button value for functions requiring a bitmask */
+#define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
+// #define UP_BUTTON _BV(7)    /**< The Up button value for functions requiring a bitmask */
+#define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
+// #define DOWN_BUTTON _BV(4)  /**< The Down button value for functions requiring a bitmask */
+#define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
+// #define A_BUTTON _BV(3)     /**< The A button value for functions requiring a bitmask */
+#define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
+// #define B_BUTTON _BV(2)     /**< The B button value for functions requiring a bitmask */
 
 #define PIN_LEFT_BUTTON A2
 #define LEFT_BUTTON_PORT PORTF

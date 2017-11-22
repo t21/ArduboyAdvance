@@ -5,7 +5,7 @@
  */
 
 #include "ArduboyAdvance.h"
-// #include "ab_logo.c"
+#include "ab_logo.c"
 // #include "glcdfont.c"
 
 //========================================
@@ -69,7 +69,7 @@ void ArduboyAdvanceBase::flashlight()
   // prevent the bootloader magic number from being overwritten by timer 0
   // when a timer variable overlaps the magic number location, for when
   // flashlight mode is used for upload problem recovery
-  power_timer0_disable();
+  // power_timer0_disable();
 
   while (true) {
     idle();
@@ -94,7 +94,7 @@ void ArduboyAdvanceBase::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVa
     digitalWriteRGB(BLUE_LED, RGB_OFF); // turn off blue LED
     delayShort(200);
     digitalWriteRGB(led, RGB_ON); // turn on "acknowledge" LED
-    EEPROM.update(EEPROM_AUDIO_ON_OFF, eeVal);
+    // EEPROM.update(EEPROM_AUDIO_ON_OFF, eeVal);
     delayShort(500);
     digitalWriteRGB(led, RGB_OFF); // turn off "acknowledge" LED
 
@@ -240,9 +240,11 @@ bool ArduboyAdvanceBase::nextFrameDEV()
 
   if (ret) {
     if (lastFrameDurationMs > eachFrameMillis)
-      TXLED1;
+      // TXLED1;
+      ;
     else
-      TXLED0;
+      // TXLED0;
+      ;
   }
   return ret;
 }
@@ -254,15 +256,15 @@ int ArduboyAdvanceBase::cpuLoad()
 
 void ArduboyAdvanceBase::initRandomSeed()
 {
-  power_adc_enable(); // ADC on
+  // power_adc_enable(); // ADC on
 
-  // do an ADC read from an unconnected input pin
-  ADCSRA |= _BV(ADSC); // start conversion (ADMUX has been pre-set in boot())
-  while (bit_is_set(ADCSRA, ADSC)) { } // wait for conversion complete
+  // // do an ADC read from an unconnected input pin
+  // ADCSRA |= _BV(ADSC); // start conversion (ADMUX has been pre-set in boot())
+  // while (bit_is_set(ADCSRA, ADSC)) { } // wait for conversion complete
 
-  randomSeed(((unsigned long)ADC << 16) + micros());
+  // randomSeed(((unsigned long)ADC << 16) + micros());
 
-  power_adc_disable(); // ADC off
+  // power_adc_disable(); // ADC off
 }
 
 /* Graphics */
@@ -277,7 +279,8 @@ void ArduboyAdvanceBase::clear()
 // multiple bit shift instruction.  We can bit shift from a lookup table
 // in flash faster than we can calculate the bit shifts on the CPU.
 const uint8_t bitshift_left[] PROGMEM = {
-  _BV(0), _BV(1), _BV(2), _BV(3), _BV(4), _BV(5), _BV(6), _BV(7)
+  // _BV(0), _BV(1), _BV(2), _BV(3), _BV(4), _BV(5), _BV(6), _BV(7)
+  0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 };
 
 void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint8_t color)
@@ -1032,66 +1035,66 @@ bool ArduboyAdvanceBase::collide(Rect rect1, Rect rect2)
            rect2.y + rect2.height <= rect1.y);
 }
 
-uint16_t ArduboyAdvanceBase::readUnitID()
-{
-  return EEPROM.read(EEPROM_UNIT_ID) |
-         (((uint16_t)(EEPROM.read(EEPROM_UNIT_ID + 1))) << 8);
-}
+// uint16_t ArduboyAdvanceBase::readUnitID()
+// {
+//   return EEPROM.read(EEPROM_UNIT_ID) |
+//          (((uint16_t)(EEPROM.read(EEPROM_UNIT_ID + 1))) << 8);
+// }
 
-void ArduboyAdvanceBase::writeUnitID(uint16_t id)
-{
-  EEPROM.update(EEPROM_UNIT_ID, (uint8_t)(id & 0xff));
-  EEPROM.update(EEPROM_UNIT_ID + 1, (uint8_t)(id >> 8));
-}
+// void ArduboyAdvanceBase::writeUnitID(uint16_t id)
+// {
+//   EEPROM.update(EEPROM_UNIT_ID, (uint8_t)(id & 0xff));
+//   EEPROM.update(EEPROM_UNIT_ID + 1, (uint8_t)(id >> 8));
+// }
 
-uint8_t ArduboyAdvanceBase::readUnitName(char* name)
-{
-  char val;
-  uint8_t dest;
-  uint8_t src = EEPROM_UNIT_NAME;
+// uint8_t ArduboyAdvanceBase::readUnitName(char* name)
+// {
+//   char val;
+//   uint8_t dest;
+//   uint8_t src = EEPROM_UNIT_NAME;
 
-  for (dest = 0; dest < ARDUBOY_UNIT_NAME_LEN; dest++)
-  {
-    val = EEPROM.read(src);
-    name[dest] = val;
-    src++;
-    if (val == 0x00 || (byte)val == 0xFF) {
-      break;
-    }
-  }
+//   for (dest = 0; dest < ARDUBOY_UNIT_NAME_LEN; dest++)
+//   {
+//     val = EEPROM.read(src);
+//     name[dest] = val;
+//     src++;
+//     if (val == 0x00 || (byte)val == 0xFF) {
+//       break;
+//     }
+//   }
 
-  name[dest] = 0x00;
-  return dest;
-}
+//   name[dest] = 0x00;
+//   return dest;
+// }
 
-void ArduboyAdvanceBase::writeUnitName(char* name)
-{
-  bool done = false;
-  uint8_t dest = EEPROM_UNIT_NAME;
+// void ArduboyAdvanceBase::writeUnitName(char* name)
+// {
+//   bool done = false;
+//   uint8_t dest = EEPROM_UNIT_NAME;
 
-  for (uint8_t src = 0; src < ARDUBOY_UNIT_NAME_LEN; src++)
-  {
-    if (name[src] == 0x00) {
-      done = true;
-    }
-    // write character or 0 pad if finished
-    EEPROM.update(dest, done ? 0x00 : name[src]);
-    dest++;
-  }
-}
+//   for (uint8_t src = 0; src < ARDUBOY_UNIT_NAME_LEN; src++)
+//   {
+//     if (name[src] == 0x00) {
+//       done = true;
+//     }
+//     // write character or 0 pad if finished
+//     EEPROM.update(dest, done ? 0x00 : name[src]);
+//     dest++;
+//   }
+// }
 
-bool ArduboyAdvanceBase::readShowUnitNameFlag()
-{
-  return (EEPROM.read(EEPROM_SYS_FLAGS) & SYS_FLAG_UNAME_MASK);
-}
+// bool ArduboyAdvanceBase::readShowUnitNameFlag()
+// {
+//   return (EEPROM.read(EEPROM_SYS_FLAGS) & SYS_FLAG_UNAME_MASK);
+// }
 
-void ArduboyAdvanceBase::writeShowUnitNameFlag(bool val)
-{
-  uint8_t flags = EEPROM.read(EEPROM_SYS_FLAGS);
+// void ArduboyAdvanceBase::writeShowUnitNameFlag(bool val)
+// {
+//   uint8_t flags = EEPROM.read(EEPROM_SYS_FLAGS);
 
-  bitWrite(flags, SYS_FLAG_UNAME, val);
-  EEPROM.update(EEPROM_SYS_FLAGS, flags);
-}
+//   bitWrite(flags, SYS_FLAG_UNAME, val);
+//   EEPROM.update(EEPROM_SYS_FLAGS, flags);
+// }
 
 void ArduboyAdvanceBase::swap(int16_t& a, int16_t& b)
 {
@@ -1163,29 +1166,29 @@ void ArduboyAdvance::bootLogoExtra()
 {
   uint8_t c;
 
-  if (!readShowUnitNameFlag())
-  {
-    return;
-  }
+  // if (!readShowUnitNameFlag())
+  // {
+  //   return;
+  // }
 
-  c = EEPROM.read(EEPROM_UNIT_NAME);
+  // c = EEPROM.read(EEPROM_UNIT_NAME);
 
-  if (c != 0xFF && c != 0x00)
-  {
-    uint8_t i = EEPROM_UNIT_NAME;
-    cursor_x = 50;
-    cursor_y = 56;
+  // if (c != 0xFF && c != 0x00)
+  // {
+  //   uint8_t i = EEPROM_UNIT_NAME;
+  //   cursor_x = 50;
+  //   cursor_y = 56;
 
-    do
-    {
-      write(c);
-      c = EEPROM.read(++i);
-    }
-    while (i < EEPROM_UNIT_NAME + ARDUBOY_UNIT_NAME_LEN);
+  //   do
+  //   {
+  //     write(c);
+  //     c = EEPROM.read(++i);
+  //   }
+  //   while (i < EEPROM_UNIT_NAME + ARDUBOY_UNIT_NAME_LEN);
 
-    display();
-    delayShort(1000);
-  }
+  //   display();
+  //   delayShort(1000);
+  // }
 }
 
 size_t ArduboyAdvance::write(uint8_t c)

@@ -10,7 +10,7 @@
 #include <Arduino.h>
 // #include <EEPROM.h>
 #include "ArduboyAdvanceCore.h"
-// #include "Sprites.h"
+#include "Sprites.h"
 #include <Print.h>
 #include <limits.h>
 
@@ -1106,7 +1106,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
 
  protected:
   // helper function for sound enable/disable system control
-  // void sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal);
+  void sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal);
 
   // functions passed to bootLogoShell() to draw the logo
   static void drawLogoBitmap(int16_t y);
