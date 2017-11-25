@@ -4,12 +4,12 @@
  * The Arduboy2Base and Arduboy2 classes and support objects and definitions.
  */
 
-#ifndef ARDUBOY2_H
-#define ARDUBOY2_H
+#ifndef _ARDUBOY_ADVANCE_H_
+#define _ARDUBOY_ADVANCE_H_
 
 #include <Arduino.h>
-#include <EEPROM.h>
-#include "Arduboy2Core.h"
+// #include <EEPROM.h>
+#include "ArduboyAdvanceCore.h"
 #include "Sprites.h"
 #include <Print.h>
 #include <limits.h>
@@ -32,22 +32,22 @@
  * #endif
  * \endcode
  */
-#define ARDUBOY_LIB_VER 40100
+#define ARDUBOY_ADVANCE_LIB_VER 00100
 
 // EEPROM settings
-#define ARDUBOY_UNIT_NAME_LEN 6 /**< The maximum length of the unit name string. */
+// #define ARDUBOY_UNIT_NAME_LEN 6 /**< The maximum length of the unit name string. */
 
-#define EEPROM_VERSION 0
-#define EEPROM_SYS_FLAGS 1
-#define EEPROM_AUDIO_ON_OFF 2
-#define EEPROM_UNIT_ID 8    // A uint16_t binary unit ID
-#define EEPROM_UNIT_NAME 10 // An up to 6 character unit name. Cannot contain
-                            // 0x00 or 0xFF. Lengths less than 6 are padded
-                            // with 0x00
+// #define EEPROM_VERSION 0
+// #define EEPROM_SYS_FLAGS 1
+// #define EEPROM_AUDIO_ON_OFF 2
+// #define EEPROM_UNIT_ID 8    // A uint16_t binary unit ID
+// #define EEPROM_UNIT_NAME 10 // An up to 6 character unit name. Cannot contain
+//                             // 0x00 or 0xFF. Lengths less than 6 are padded
+//                             // with 0x00
 
-// EEPROM_SYS_FLAGS values
-#define SYS_FLAG_UNAME 0    // Display the unit name on the logo screen
-#define SYS_FLAG_UNAME_MASK _BV(SYS_FLAG_UNAME)
+// // EEPROM_SYS_FLAGS values
+// #define SYS_FLAG_UNAME 0    // Display the unit name on the logo screen
+// #define SYS_FLAG_UNAME_MASK _BV(SYS_FLAG_UNAME)
 
 /** \brief
  * Start of EEPROM storage space for sketches.
@@ -57,10 +57,10 @@
  * This define specifies the first EEPROM location past the system area.
  * Sketches can use locations from here to the end of EEPROM space.
  */
-#define EEPROM_STORAGE_SPACE_START 16
+// #define EEPROM_STORAGE_SPACE_START 16
 
 // eeprom settings above are neded for audio
-#include "Arduboy2Audio.h"
+// #include "Arduboy2Audio.h"
 
 // If defined, it is safe to draw outside of the screen boundaries.
 // Pixels that would exceed the display limits will be ignored.
@@ -114,17 +114,17 @@ struct Point
   int16_t y; /**< The Y coordinate of the point */
 };
 
-//==================================
-//========== Arduboy2Base ==========
-//==================================
+//========================================
+//========== ArduboyAdvanceBase ==========
+//========================================
 
 /** \brief
  * The main functions provided for writing sketches for the Arduboy,
  * _minus_ text output.
  *
  * \details
- * This class in inherited by Arduboy2, so if text output functions are
- * required Arduboy2 should be used instead.
+ * This class in inherited by ArduboyAdvance, so if text output functions are
+ * required ArduboyAdvance should be used instead.
  *
  * \note
  * \parblock
@@ -157,12 +157,12 @@ struct Point
  *
  * \see Arduboy2
  */
-class Arduboy2Base : public Arduboy2Core
+class ArduboyAdvanceBase : public ArduboyAdvanceCore
 {
  friend class Arduboy2Ex;
 
  public:
-  Arduboy2Base();
+  ArduboyAdvanceBase();
 
   /** \brief
    * An object created to provide audio control functions within this class.
@@ -173,7 +173,7 @@ class Arduboy2Base : public Arduboy2Core
    *
    * \see Arduboy2Audio
    */
-  Arduboy2Audio audio;
+  // Arduboy2Audio audio;
 
   /** \brief
    * Initialize the hardware, display the boot logo, provide boot utilities, etc.
@@ -944,7 +944,7 @@ class Arduboy2Base : public Arduboy2Core
    *
    * \see writeUnitID() readUnitName()
    */
-  uint16_t readUnitID();
+  // uint16_t readUnitID();
 
   /** \brief
    * Write a unit ID to system EEPROM.
@@ -958,7 +958,7 @@ class Arduboy2Base : public Arduboy2Core
    *
    * \see readUnitID() writeUnitName()
    */
-  void writeUnitID(uint16_t id);
+  // void writeUnitID(uint16_t id);
 
   /** \brief
    * Read the unit name from system EEPROM.
@@ -995,7 +995,7 @@ class Arduboy2Base : public Arduboy2Core
    *
    * \see writeUnitName() readUnitID() Arduboy2::bootLogoExtra()
    */
-  uint8_t readUnitName(char* name);
+  // uint8_t readUnitName(char* name);
 
   /** \brief
    * Write a unit name to system EEPROM.
@@ -1021,7 +1021,7 @@ class Arduboy2Base : public Arduboy2Core
    *
    * \see readUnitName() writeUnitID() Arduboy2::bootLogoExtra()
    */
-  void writeUnitName(char* name);
+  // void writeUnitName(char* name);
 
   /** \brief
    * Read the "Show Unit Name" flag in system EEPROM.
@@ -1037,7 +1037,7 @@ class Arduboy2Base : public Arduboy2Core
    * \see writeShowUnitNameFlag() writeUnitName() readUnitName()
    * Arduboy2::bootLogoExtra()
    */
-  bool readShowUnitNameFlag();
+  // bool readShowUnitNameFlag();
 
   /** \brief
    * Write the "Show Unit Name" flag in system EEPROM.
@@ -1053,7 +1053,7 @@ class Arduboy2Base : public Arduboy2Core
    * \see readShowUnitNameFlag() writeUnitName() readUnitName()
    * Arduboy2::bootLogoExtra()
    */
-  void writeShowUnitNameFlag(bool val);
+  // void writeShowUnitNameFlag(bool val);
 
   /** \brief
    * A counter which is incremented once per frame.
@@ -1127,17 +1127,17 @@ class Arduboy2Base : public Arduboy2Core
 };
 
 
-//==============================
-//========== Arduboy2 ==========
-//==============================
+//====================================
+//========== ArduboyAdvance ==========
+//====================================
 
 /** \brief
  * The main functions provided for writing sketches for the Arduboy,
  * _including_ text output.
  *
  * \details
- * This class is derived from Arduboy2Base. It provides text output functions
- * in addition to all the functions inherited from Arduboy2Base.
+ * This class is derived from ArduboyAdvanceBase. It provides text output functions
+ * in addition to all the functions inherited from ArduboyAdvanceBase.
  *
  * \note
  * A friend class named _Arduboy2Ex_ is declared by this class. The intention
@@ -1146,14 +1146,14 @@ class Arduboy2Base : public Arduboy2Core
  * that this may eliminate the need to create an entire local copy of the
  * library, in order to extend the functionality, in most circumstances.
  *
- * \see Arduboy2Base
+ * \see ArduboyAdvanceBase
  */
-class Arduboy2 : public Print, public Arduboy2Base
+class ArduboyAdvance : public Print, public ArduboyAdvanceBase
 {
  friend class Arduboy2Ex;
 
  public:
-  Arduboy2();
+  ArduboyAdvance();
 
   /** \class Print
    * \brief
@@ -1431,5 +1431,4 @@ class Arduboy2 : public Print, public Arduboy2Base
   bool textWrap;
 };
 
-#endif
-
+#endif  // #ifndef _ARDUBOY_ADVANCE_H_

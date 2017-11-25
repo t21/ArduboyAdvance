@@ -7,6 +7,7 @@
 #######################################
 
 Arduboy2	KEYWORD1
+ArduboyAdvance	KEYWORD1
 Arduboy2Base	KEYWORD1
 Sprites	KEYWORD1
 
