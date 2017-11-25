@@ -110,7 +110,19 @@ void ArduboyAdvanceCore::setCPUSpeed8MHz()
 // This routine must be modified if any pins are moved to a different port
 void ArduboyAdvanceCore::bootPins()
 {
-#ifdef ARDUBOY_10
+
+#ifdef ARDUBOY_20
+
+pinMode(PIN_A_BUTTON, INPUT_PULLUP);
+pinMode(PIN_B_BUTTON, INPUT_PULLUP);
+pinMode(PIN_X_BUTTON, INPUT_PULLUP);
+pinMode(PIN_Y_BUTTON, INPUT_PULLUP);
+pinMode(PIN_DOWN_BUTTON, INPUT_PULLUP); //Joystick
+pinMode(PIN_LEFT_BUTTON, INPUT_PULLUP); //Joystick
+pinMode(PIN_RIGHT_BUTTON, INPUT_PULLUP); //Joystick
+pinMode(PIN_UP_BUTTON, INPUT_PULLUP); //Joystick
+
+#elif defined(ARDUBOY_10)
 
   // Port B INPUT_PULLUP or HIGH
   PORTB |= (1 << RED_LED_BIT) | (1 << GREEN_LED_BIT) | (1 << BLUE_LED_BIT) |
@@ -449,9 +461,20 @@ void ArduboyAdvanceCore::digitalWriteRGB(uint8_t color, uint8_t val)
 uint8_t ArduboyAdvanceCore::buttonsState()
 {
   uint8_t buttons;
+#ifdef ARDUBOY_20
+  uint8_t Abit;
+  uint8_t Bbit;
+  uint8_t Xbit;
+  uint8_t Ybit;
+  Abit = ~digitalRead(PIN_A_BUTTON) & 0x01;
+  Bbit = ~digitalRead(PIN_B_BUTTON) & 0x01;
+  Xbit = ~digitalRead(PIN_X_BUTTON) & 0x01;
+  Ybit = ~digitalRead(PIN_Y_BUTTON) & 0x01;
+
+  buttons = (Abit << 3) | (Bbit << 2) | (Xbit << 1) | (Ybit);
 
   // using ports here is ~100 bytes smaller than digitalRead()
-#ifdef AB_DEVKIT
+#elif defined(AB_DEVKIT)
   // down, left, up
   buttons = ((~PINB) & B01110000);
   // right button

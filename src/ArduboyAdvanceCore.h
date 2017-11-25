@@ -73,41 +73,23 @@
 // bit values for button states
 // these are determined by the buttonsState() function
 #define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
-// #define LEFT_BUTTON _BV(5)  /**< The Left button value for functions requiring a bitmask */
 #define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
-// #define RIGHT_BUTTON _BV(6) /**< The Right button value for functions requiring a bitmask */
 #define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
-// #define UP_BUTTON _BV(7)    /**< The Up button value for functions requiring a bitmask */
 #define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
-// #define DOWN_BUTTON _BV(4)  /**< The Down button value for functions requiring a bitmask */
 #define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
-// #define A_BUTTON _BV(3)     /**< The A button value for functions requiring a bitmask */
 #define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
-// #define B_BUTTON _BV(2)     /**< The B button value for functions requiring a bitmask */
+#define X_BUTTON 0b00000010
+#define Y_BUTTON 0b00000001
 
+//Button pins
 #define PIN_LEFT_BUTTON A2
-#define LEFT_BUTTON_PORT 0 //PORTF
-#define LEFT_BUTTON_BIT 0 //PORTF5
-
 #define PIN_RIGHT_BUTTON A1
-#define RIGHT_BUTTON_PORT 0 //PORTF
-#define RIGHT_BUTTON_BIT 0 //PORTF6
-
 #define PIN_UP_BUTTON A0
-#define UP_BUTTON_PORT 0 //PORTF
-#define UP_BUTTON_BIT 0 //PORTF7
-
 #define PIN_DOWN_BUTTON A3
-#define DOWN_BUTTON_PORT 0 //PORTF
-#define DOWN_BUTTON_BIT 0 //PORTF4
-
-#define PIN_A_BUTTON 7
-#define A_BUTTON_PORT 0 //PORTE
-#define A_BUTTON_BIT 0 //PORTE6
-
-#define PIN_B_BUTTON 8
-#define B_BUTTON_PORT 0 //PORTB
-#define B_BUTTON_BIT 0 //PORTB4
+#define PIN_A_BUTTON 0
+#define PIN_B_BUTTON 1
+#define PIN_X_BUTTON 2
+#define PIN_Y_BUTTON 3
 
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
