@@ -28,15 +28,107 @@
  *     // #define ARDUBOY_10
  *     #define AB_DEVKIT
  */
-#define ARDUBOY_10   //< compile for the production Arduboy v1.0
+#define ARDUBOY_20   //< compile for the production Arduboy v2.0
+//#define ARDUBOY_10   //< compile for the production Arduboy v1.0
 // #define AB_DEVKIT    //< compile for the official dev kit
 #endif
 
 #define RGB_ON LOW   /**< For digitially setting an RGB LED on using digitalWriteRGB() */
 #define RGB_OFF HIGH /**< For digitially setting an RGB LED off using digitalWriteRGB() */
 
-// ----- Arduboy pins -----
-#ifdef ARDUBOY_10
+// ----- Arduboy 2.0 pins -----
+#ifdef ARDUBOY_20
+
+#define PIN_CS 12       // Display CS Arduino pin number
+#define CS_PORT 0 //PORTD   // Display CS port
+#define CS_BIT 0 //PORTD6   // Display CS physical bit number
+
+#define PIN_DC 4        // Display D/C Arduino pin number
+#define DC_PORT 0 //PORTD   // Display D/C port
+#define DC_BIT 0 //PORTD4   // Display D/C physical bit number
+
+#define PIN_RST 6       // Display reset Arduino pin number
+#define RST_PORT 1 //PORTD  // Display reset port
+#define RST_BIT 1 //PORTD7  // Display reset physical bit number
+
+#define SPI_MOSI_PORT 0 //PORTB
+#define SPI_MOSI_BIT 0 //PORTB2
+
+#define SPI_SCK_PORT 0 //PORTB
+#define SPI_SCK_BIT 0 //PORTB1
+
+#define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
+#define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
+#define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
+
+#define RED_LED_PORT 0 //PORTB
+#define RED_LED_BIT 0 //PORTB6
+
+#define GREEN_LED_PORT 0 //PORTB
+#define GREEN_LED_BIT 0 //PORTB7
+
+#define BLUE_LED_PORT 0 //PORTB
+#define BLUE_LED_BIT 0 //PORTB5
+
+// bit values for button states
+// these are determined by the buttonsState() function
+#define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
+// #define LEFT_BUTTON _BV(5)  /**< The Left button value for functions requiring a bitmask */
+#define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
+// #define RIGHT_BUTTON _BV(6) /**< The Right button value for functions requiring a bitmask */
+#define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
+// #define UP_BUTTON _BV(7)    /**< The Up button value for functions requiring a bitmask */
+#define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
+// #define DOWN_BUTTON _BV(4)  /**< The Down button value for functions requiring a bitmask */
+#define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
+// #define A_BUTTON _BV(3)     /**< The A button value for functions requiring a bitmask */
+#define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
+// #define B_BUTTON _BV(2)     /**< The B button value for functions requiring a bitmask */
+
+#define PIN_LEFT_BUTTON A2
+#define LEFT_BUTTON_PORT 0 //PORTF
+#define LEFT_BUTTON_BIT 0 //PORTF5
+
+#define PIN_RIGHT_BUTTON A1
+#define RIGHT_BUTTON_PORT 0 //PORTF
+#define RIGHT_BUTTON_BIT 0 //PORTF6
+
+#define PIN_UP_BUTTON A0
+#define UP_BUTTON_PORT 0 //PORTF
+#define UP_BUTTON_BIT 0 //PORTF7
+
+#define PIN_DOWN_BUTTON A3
+#define DOWN_BUTTON_PORT 0 //PORTF
+#define DOWN_BUTTON_BIT 0 //PORTF4
+
+#define PIN_A_BUTTON 7
+#define A_BUTTON_PORT 0 //PORTE
+#define A_BUTTON_BIT 0 //PORTE6
+
+#define PIN_B_BUTTON 8
+#define B_BUTTON_PORT 0 //PORTB
+#define B_BUTTON_BIT 0 //PORTB4
+
+#define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
+#define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
+
+#define SPEAKER_1_PORT 0 //PORTC
+#define SPEAKER_1_DDR 0 //DDRC
+#define SPEAKER_1_BIT 0 //PORTC6
+
+#define SPEAKER_2_PORT 0 //PORTC
+#define SPEAKER_2_DDR 0 //DDRC
+#define SPEAKER_2_BIT 0 //PORTC7
+
+#define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
+#define RAND_SEED_IN_PORTF
+#define RAND_SEED_IN_BIT 0 //PORTF1
+// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+#define RAND_SEED_IN_ADMUX ((1 << REFS0) | (1 << REFS1) | (1 << MUX0))
+// -----------------------
+
+// ----- Arduboy 1.0 pins -----
+#elif defined(ARDUBOY_10)
 
 #define PIN_CS 12       // Display CS Arduino pin number
 #define CS_PORT PORTD   // Display CS port

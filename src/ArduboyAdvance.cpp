@@ -6,7 +6,7 @@
 
 #include "ArduboyAdvance.h"
 #include "ab_logo.c"
-// #include "glcdfont.c"
+#include "glcdfont.c"
 
 //========================================
 //========== class ArduboyAdvanceBase ==========
@@ -307,28 +307,28 @@ void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint8_t color)
   // which can be declared a read-write operand
   const uint8_t* bsl = bitshift_left;
 
-  asm volatile
-  (
-    "mul %[width_offset], %A[y]\n"
-    "movw %[row_offset], r0\n"
-    "andi %A[row_offset], 0x80\n" // row_offset &= (~0b01111111);
-    "clr __zero_reg__\n"
-    "add %A[row_offset], %[x]\n"
-    // mask for only 0-7
-    "andi %A[y], 0x07\n"
-    // Z += y
-    "add r30, %A[y]\n"
-    "adc r31, __zero_reg__\n"
-    // load correct bitshift from program RAM
-    "lpm %[bit], Z\n"
-    : [row_offset] "=&x" (row_offset), // upper register (ANDI)
-      [bit] "=r" (bit),
-      [y] "+d" (y), // upper register (ANDI), must be writable
-      "+z" (bsl) // is modified to point to the proper shift array element
-    : [width_offset] "r" ((uint8_t)(WIDTH/8)),
-      [x] "r" ((uint8_t)x)
-    :
-  );
+  // asm volatile
+  // (
+  //   "mul %[width_offset], %A[y]\n"
+  //   "movw %[row_offset], r0\n"
+  //   "andi %A[row_offset], 0x80\n" // row_offset &= (~0b01111111);
+  //   "clr __zero_reg__\n"
+  //   "add %A[row_offset], %[x]\n"
+  //   // mask for only 0-7
+  //   "andi %A[y], 0x07\n"
+  //   // Z += y
+  //   "add r30, %A[y]\n"
+  //   "adc r31, __zero_reg__\n"
+  //   // load correct bitshift from program RAM
+  //   "lpm %[bit], Z\n"
+  //   : [row_offset] "=&x" (row_offset), // upper register (ANDI)
+  //     [bit] "=r" (bit),
+  //     [y] "+d" (y), // upper register (ANDI), must be writable
+  //     "+z" (bsl) // is modified to point to the proper shift array element
+  //   : [width_offset] "r" ((uint8_t)(WIDTH/8)),
+  //     [x] "r" ((uint8_t)x)
+  //   :
+  // );
 
   if (color) {
     sBuffer[row_offset] |=   bit;
@@ -341,7 +341,7 @@ uint8_t ArduboyAdvanceBase::getPixel(uint8_t x, uint8_t y)
 {
   uint8_t row = y / 8;
   uint8_t bit_position = y % 8;
-  return (sBuffer[(row*WIDTH) + x] & _BV(bit_position)) >> bit_position;
+  return (sBuffer[(row*WIDTH) + x] & (1 << bit_position)) >> bit_position;
 }
 
 void ArduboyAdvanceBase::drawCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color)
@@ -622,30 +622,30 @@ void ArduboyAdvanceBase::fillScreen(uint8_t color)
   // which can be declared a read-write operand
   uint8_t* bPtr = sBuffer;
 
-  asm volatile
-  (
-    // if value is zero, skip assigning to 0xff
-    "cpse %[color], __zero_reg__\n"
-    "ldi %[color], 0xFF\n"
-    // counter = 0
-    "clr __tmp_reg__\n"
-    "loopto:\n"
-    // (4x) push zero into screen buffer,
-    // then increment buffer position
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-    "st Z+, %[color]\n"
-    // increase counter
-    "inc __tmp_reg__\n"
-    // repeat for 256 loops
-    // (until counter rolls over back to 0)
-    "brne loopto\n"
-    : [color] "+d" (color),
-      "+z" (bPtr)
-    :
-    :
-  );
+  // asm volatile
+  // (
+  //   // if value is zero, skip assigning to 0xff
+  //   "cpse %[color], __zero_reg__\n"
+  //   "ldi %[color], 0xFF\n"
+  //   // counter = 0
+  //   "clr __tmp_reg__\n"
+  //   "loopto:\n"
+  //   // (4x) push zero into screen buffer,
+  //   // then increment buffer position
+  //   "st Z+, %[color]\n"
+  //   "st Z+, %[color]\n"
+  //   "st Z+, %[color]\n"
+  //   "st Z+, %[color]\n"
+  //   // increase counter
+  //   "inc __tmp_reg__\n"
+  //   // repeat for 256 loops
+  //   // (until counter rolls over back to 0)
+  //   "brne loopto\n"
+  //   : [color] "+d" (color),
+  //     "+z" (bPtr)
+  //   :
+  //   :
+  // );
 }
 
 void ArduboyAdvanceBase::drawRoundRect

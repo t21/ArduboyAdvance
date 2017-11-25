@@ -81,7 +81,7 @@ void ArduboyAdvanceCore::boot()
   #endif
 
   // Select the ADC input here so a delay isn't required in initRandomSeed()
-  ADMUX = RAND_SEED_IN_ADMUX;
+  // ADMUX = RAND_SEED_IN_ADMUX;
 
   bootPins();
   bootSPI();
@@ -113,42 +113,42 @@ void ArduboyAdvanceCore::bootPins()
 #ifdef ARDUBOY_10
 
   // Port B INPUT_PULLUP or HIGH
-  PORTB |= _BV(RED_LED_BIT) | _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT) |
-           _BV(B_BUTTON_BIT);
+  PORTB |= (1 << RED_LED_BIT) | (1 << GREEN_LED_BIT) | (1 << BLUE_LED_BIT) |
+           (1 << B_BUTTON_BIT);
   // Port B INPUT or LOW (none)
   // Port B inputs
-  DDRB &= ~(_BV(B_BUTTON_BIT));
+  DDRB &= ~((1 << B_BUTTON_BIT));
   // Port B outputs
-  DDRB |= _BV(RED_LED_BIT) | _BV(GREEN_LED_BIT) | _BV(BLUE_LED_BIT) |
-          _BV(SPI_MOSI_BIT) | _BV(SPI_SCK_BIT);
+  DDRB |= (1 << RED_LED_BIT) | (1 << GREEN_LED_BIT) | (1 << BLUE_LED_BIT) |
+          (1 << SPI_MOSI_BIT) | (1 << SPI_SCK_BIT);
 
   // Port C
   // Speaker: Not set here. Controlled by audio class
 
   // Port D INPUT_PULLUP or HIGH
-  PORTD |= _BV(CS_BIT);
+  PORTD |= (1 << CS_BIT);
   // Port D INPUT or LOW
-  PORTD &= ~(_BV(RST_BIT));
+  PORTD &= ~((1 << RST_BIT));
   // Port D inputs (none)
   // Port D outputs
-  DDRD |= _BV(RST_BIT) | _BV(CS_BIT) | _BV(DC_BIT);
+  DDRD |= (1 << RST_BIT) | (1 << CS_BIT) | (1 << DC_BIT);
 
   // Port E INPUT_PULLUP or HIGH
-  PORTE |= _BV(A_BUTTON_BIT);
+  PORTE |= (1 << A_BUTTON_BIT);
   // Port E INPUT or LOW (none)
   // Port E inputs
-  DDRE &= ~(_BV(A_BUTTON_BIT));
+  DDRE &= ~((1 << A_BUTTON_BIT));
   // Port E outputs (none)
 
   // Port F INPUT_PULLUP or HIGH
-  PORTF |= _BV(LEFT_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) |
-           _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT);
+  PORTF |= (1 << LEFT_BUTTON_BIT) | (1 << RIGHT_BUTTON_BIT) |
+           (1 << UP_BUTTON_BIT) | (1 << DOWN_BUTTON_BIT);
   // Port F INPUT or LOW
-  PORTF &= ~(_BV(RAND_SEED_IN_BIT));
+  PORTF &= ~((1 << RAND_SEED_IN_BIT));
   // Port F inputs
-  DDRF &= ~(_BV(LEFT_BUTTON_BIT) | _BV(RIGHT_BUTTON_BIT) |
-            _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) |
-            _BV(RAND_SEED_IN_BIT));
+  DDRF &= ~((1 << LEFT_BUTTON_BIT) | (1 << RIGHT_BUTTON_BIT) |
+            (1 << UP_BUTTON_BIT) | (1 << DOWN_BUTTON_BIT) |
+            (1 << RAND_SEED_IN_BIT));
   // Port F outputs (none)
 
 #elif defined(AB_DEVKIT)
@@ -195,11 +195,11 @@ void ArduboyAdvanceCore::bootOLED()
 {
   // reset the display
   delayShort(5); // reset pin should be low here. let it stay low a while
-  bitSet(RST_PORT, RST_BIT); // set high to come out of reset
+  // bitSet(RST_PORT, RST_BIT); // set high to come out of reset
   delayShort(5); // wait a while
 
   // select the display (permanently, since nothing else is using SPI)
-  bitClear(CS_PORT, CS_BIT);
+  // bitClear(CS_PORT, CS_BIT);
 
   // run our customized boot-up command sequence against the
   // OLED to initialize it properly for Arduboy
@@ -212,26 +212,26 @@ void ArduboyAdvanceCore::bootOLED()
 
 void ArduboyAdvanceCore::LCDDataMode()
 {
-  bitSet(DC_PORT, DC_BIT);
+  // bitSet(DC_PORT, DC_BIT);
 }
 
 void ArduboyAdvanceCore::LCDCommandMode()
 {
-  bitClear(DC_PORT, DC_BIT);
+  // bitClear(DC_PORT, DC_BIT);
 }
 
 // Initialize the SPI interface for the display
 void ArduboyAdvanceCore::bootSPI()
 {
 // master, mode 0, MSB first, CPU clock / 2 (8MHz)
-  SPCR = _BV(SPE) | _BV(MSTR);
-  SPSR = _BV(SPI2X);
+  // SPCR = _BV(SPE) | _BV(MSTR);
+  // SPSR = _BV(SPI2X);
 }
 
 // Write to the SPI bus (MOSI pin)
 void ArduboyAdvanceCore::SPItransfer(uint8_t data)
 {
-  SPDR = data;
+  // SPDR = data;
   /*
    * The following NOP introduces a small delay that can prevent the wait
    * loop form iterating when running at the maximum speed. This gives
@@ -239,7 +239,7 @@ void ArduboyAdvanceCore::SPItransfer(uint8_t data)
    * speeds it is unnoticed.
    */
   asm volatile("nop");
-  while (!(SPSR & _BV(SPIF))) { } // wait
+  // while (!(SPSR & _BV(SPIF))) { } // wait
 }
 
 void ArduboyAdvanceCore::safeMode()
@@ -250,7 +250,7 @@ void ArduboyAdvanceCore::safeMode()
 
     // prevent the bootloader magic number from being overwritten by timer 0
     // when a timer variable overlaps the magic number location
-    power_timer0_disable();
+    // power_timer0_disable();
 
     while (true) { }
   }
@@ -261,17 +261,17 @@ void ArduboyAdvanceCore::safeMode()
 
 void ArduboyAdvanceCore::idle()
 {
-  set_sleep_mode(SLEEP_MODE_IDLE);
-  sleep_mode();
+  // set_sleep_mode(SLEEP_MODE_IDLE);
+  // sleep_mode();
 }
 
 void ArduboyAdvanceCore::bootPowerSaving()
 {
-  // disable Two Wire Interface (I2C) and the ADC
-  PRR0 = _BV(PRTWI) | _BV(PRADC);
-  // disable USART1
-  PRR1 = _BV(PRUSART1);
-  // All other bits will be written with 0 so will be enabled
+  // // disable Two Wire Interface (I2C) and the ADC
+  // PRR0 = _BV(PRTWI) | _BV(PRADC);
+  // // disable USART1
+  // PRR1 = _BV(PRUSART1);
+  // // All other bits will be written with 0 so will be enabled
 }
 
 // Shut down the display
@@ -282,7 +282,7 @@ void ArduboyAdvanceCore::displayOff()
   SPItransfer(0x8D); // charge pump:
   SPItransfer(0x10); //   disable
   delayShort(250);
-  bitClear(RST_PORT, RST_BIT); // set display reset pin low (reset state)
+  // bitClear(RST_PORT, RST_BIT); // set display reset pin low (reset state)
 }
 
 // Restart the display after a displayOff()
@@ -320,11 +320,11 @@ void ArduboyAdvanceCore::paintScreen(uint8_t image[], bool clear)
 
   if (clear)
   {
-    SPDR = image[i]; // set the first SPI data byte to get things started
+    // SPDR = image[i]; // set the first SPI data byte to get things started
     image[i++] = 0;  // clear the first image byte
   }
   else
-    SPDR = image[i++];
+    // SPDR = image[i++];
 
   // the code to iterate the loop and get the next byte from the buffer is
   // executed while the previous byte is being sent out by the SPI controller
@@ -341,13 +341,13 @@ void ArduboyAdvanceCore::paintScreen(uint8_t image[], bool clear)
     else
       c = image[i++];
 
-    while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent
+    // while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent
 
     // put the next byte in the SPI data register. The SPI controller will
     // clock it out while the loop continues and gets the next byte ready
-    SPDR = c;
+    // SPDR = c;
   }
-  while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
+  // while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
 }
 
 void ArduboyAdvanceCore::blank()
