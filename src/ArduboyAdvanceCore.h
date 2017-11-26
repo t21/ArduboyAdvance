@@ -39,6 +39,9 @@
 // ----- Arduboy 2.0 pins -----
 #ifdef ARDUBOY_20
 
+//Analog read bits
+#define A_READ_BITS 12
+
 #define PIN_CS 12       // Display CS Arduino pin number
 #define CS_PORT 0 //PORTD   // Display CS port
 #define CS_BIT 0 //PORTD6   // Display CS physical bit number
@@ -94,9 +97,16 @@
 #define PIN_JOY_SEL_BUTTON 4
 
 //Joystick
-#define PIN_JOY_X_AXIS A6
-#define PIN_JOY_Y_AXIS A5
-
+#define PIN_JOY_X_AXIS A5
+#define PIN_JOY_Y_AXIS A6
+#define JOY_X_THRESHOLD_LOW 2000
+#define JOY_Y_THRESHOLD_LOW 2020
+#define JOY_X_THRESHOLD_HIGH 2080
+#define JOY_Y_THRESHOLD_HIGH 2060
+#define JOY_X_THRESHOLD_SCALED_LOW -3
+#define JOY_Y_THRESHOLD_SCALED_LOW -2
+#define JOY_X_THRESHOLD_SCALED_HIGH 0
+#define JOY_Y_THRESHOLD_SCALED_HIGH 0 //Maybe 1
 
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
