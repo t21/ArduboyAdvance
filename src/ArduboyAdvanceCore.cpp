@@ -117,10 +117,9 @@ pinMode(PIN_A_BUTTON, INPUT_PULLUP);
 pinMode(PIN_B_BUTTON, INPUT_PULLUP);
 pinMode(PIN_X_BUTTON, INPUT_PULLUP);
 pinMode(PIN_Y_BUTTON, INPUT_PULLUP);
-pinMode(PIN_DOWN_BUTTON, INPUT_PULLUP); //Joystick
-pinMode(PIN_LEFT_BUTTON, INPUT_PULLUP); //Joystick
-pinMode(PIN_RIGHT_BUTTON, INPUT_PULLUP); //Joystick
-pinMode(PIN_UP_BUTTON, INPUT_PULLUP); //Joystick
+pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP); //Maybe pullup
+pinMode(PIN_JOY_X_AXIS, INPUT);
+pinMode(PIN_JOY_Y_AXIS, INPUT);
 
 #elif defined(ARDUBOY_10)
 
@@ -466,12 +465,15 @@ uint8_t ArduboyAdvanceCore::buttonsState()
   uint8_t Bbit;
   uint8_t Xbit;
   uint8_t Ybit;
+  uint8_t Selbit;
+
   Abit = ~digitalRead(PIN_A_BUTTON) & 0x01;
   Bbit = ~digitalRead(PIN_B_BUTTON) & 0x01;
   Xbit = ~digitalRead(PIN_X_BUTTON) & 0x01;
   Ybit = ~digitalRead(PIN_Y_BUTTON) & 0x01;
+  Selbit = ~digitalRead(PIN_JOY_SEL_BUTTON) & 0x01;
 
-  buttons = (Abit << 3) | (Bbit << 2) | (Xbit << 1) | (Ybit);
+  buttons = (Selbit << 4) | (Abit << 3) | (Bbit << 2) | (Xbit << 1) | (Ybit);
 
   // using ports here is ~100 bytes smaller than digitalRead()
 #elif defined(AB_DEVKIT)
