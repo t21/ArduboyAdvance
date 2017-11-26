@@ -1021,6 +1021,40 @@ bool ArduboyAdvanceBase::justReleased(uint8_t button)
   return ((previousButtonState & button) && !(currentButtonState & button));
 }
 
+int ArduboyAdvanceBase::joyX() {
+  int val = analogRead(PIN_JOY_X_AXIS);
+  if (val > JOY_X_THRESHOLD_HIGH || val < JOY_X_THRESHOLD_LOW) 
+    return val;
+  else 
+    return 0;
+}
+
+int ArduboyAdvanceBase::joyY() {
+  int val = analogRead(PIN_JOY_Y_AXIS);
+  if (val > JOY_Y_THRESHOLD_HIGH || val < JOY_Y_THRESHOLD_LOW) 
+    return val;
+  else 
+    return 0;
+}
+
+long ArduboyAdvanceBase::scaledJoyX() {
+  long val = analogRead(PIN_JOY_X_AXIS);
+  val = map(val,0,pow(2,A_READ_BITS),-100,100); 
+  if (val > JOY_X_THRESHOLD_SCALED_HIGH || val < JOY_X_THRESHOLD_SCALED_LOW) 
+    return val; 
+  else
+    return 0;
+}
+
+long ArduboyAdvanceBase::scaledJoyY() {
+  long val = analogRead(PIN_JOY_Y_AXIS);
+  val = map(val,0,pow(2,A_READ_BITS),-100,100);
+  if (val > JOY_Y_THRESHOLD_SCALED_HIGH || val < JOY_Y_THRESHOLD_SCALED_LOW) 
+    return val;
+  else 
+    return 0;
+}
+
 bool ArduboyAdvanceBase::collide(Point point, Rect rect)
 {
   return ((point.x >= rect.x) && (point.x < rect.x + rect.width) &&
