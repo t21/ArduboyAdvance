@@ -80,16 +80,23 @@
 #define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
 #define X_BUTTON 0b00000010
 #define Y_BUTTON 0b00000001
+#define SEL_BUTTON 0b00010000
 
 //Button pins
-#define PIN_LEFT_BUTTON A2
-#define PIN_RIGHT_BUTTON A1
-#define PIN_UP_BUTTON A0
-#define PIN_DOWN_BUTTON A3
+//#define PIN_LEFT_BUTTON A2
+//#define PIN_RIGHT_BUTTON A1
+//#define PIN_UP_BUTTON A0
+//#define PIN_DOWN_BUTTON A3
 #define PIN_A_BUTTON 0
 #define PIN_B_BUTTON 1
 #define PIN_X_BUTTON 2
 #define PIN_Y_BUTTON 3
+#define PIN_JOY_SEL_BUTTON 4
+
+//Joystick
+#define PIN_JOY_X_AXIS A6
+#define PIN_JOY_Y_AXIS A5
+
 
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
