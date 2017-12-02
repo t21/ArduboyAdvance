@@ -526,8 +526,7 @@ void ArduboyAdvanceBase::drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, ui
   drawFastVLine(x+w-1, y, h, color);
 }
 
-void ArduboyAdvanceBase::drawFastVLine
-(int16_t x, int16_t y, uint8_t h, uint16_t color)
+void ArduboyAdvanceBase::drawFastVLine(int16_t x, int16_t y, uint16_t h, uint16_t color)
 {
   int end = y+h;
   for (int a = max(0,y); a < min(end,HEIGHT); a++)
@@ -536,7 +535,7 @@ void ArduboyAdvanceBase::drawFastVLine
   }
 }
 
-void ArduboyAdvanceBase::drawFastHLine(int16_t x, int16_t y, uint8_t w, uint16_t color)
+void ArduboyAdvanceBase::drawFastHLine(int16_t x, int16_t y, uint16_t w, uint16_t color)
 {
   int16_t xEnd; // last x point + 1
 
@@ -560,6 +559,14 @@ void ArduboyAdvanceBase::drawFastHLine(int16_t x, int16_t y, uint8_t w, uint16_t
 
   // calculate actual width (even if unchanged)
   w = xEnd - x;
+
+  uint32_t startPixel = x + y * WIDTH;
+
+  for (int16_t i = 0; i < w; i++) {
+    sBuffer[startPixel + i] = color;
+  }
+
+  return;
 
   // buffer pointer plus row offset + x offset
   register uint16_t *pBuf = sBuffer + ((y / 8) * WIDTH) + x;

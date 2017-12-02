@@ -470,7 +470,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param h The height of the line.
    * \param color The color of the line (optional; defaults to WHITE).
    */
-  void drawFastVLine(int16_t x, int16_t y, uint8_t h, uint16_t color = WHITE);
+  void drawFastVLine(int16_t x, int16_t y, uint16_t h, uint16_t color = WHITE);
 
   /** \brief
    * Draw a horizontal line.
@@ -480,7 +480,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param w The width of the line.
    * \param color The color of the line (optional; defaults to WHITE).
    */
-  void drawFastHLine(int16_t x, int16_t y, uint8_t w, uint16_t color = WHITE);
+  void drawFastHLine(int16_t x, int16_t y, uint16_t w, uint16_t color = WHITE);
 
   /** \brief
    * Draw a filled-in rectangle of a specified width and height.
