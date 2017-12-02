@@ -285,12 +285,12 @@ const uint8_t bitshift_left[] PROGMEM = {
 
 void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
-  #ifdef PIXEL_SAFE_MODE
+  // #ifdef PIXEL_SAFE_MODE
   if (x < 0 || x > (WIDTH-1) || y < 0 || y > (HEIGHT-1))
   {
     return;
   }
-  #endif
+  // #endif
 
   uint16_t row_offset;
   uint8_t bit;
@@ -299,7 +299,7 @@ void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint16_t color)
   // row_offset = (row*WIDTH) + (uint8_t)x;
   // bit = _BV((uint8_t)y % 8);
 
-  pixel = x + y * WIDTH;
+  uint32_t pixel = x + y * WIDTH;
 
   // the above math can also be rewritten more simply as;
   //   row_offset = (y * WIDTH/8) & ~0b01111111 + (uint8_t)x;
