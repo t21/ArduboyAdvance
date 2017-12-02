@@ -67,8 +67,18 @@
 #define PIXEL_SAFE_MODE
 
 // pixel colors
-#define BLACK 0  /**< Color value for an unlit pixel for draw functions. */
-#define WHITE 1  /**< Color value for a lit pixel for draw functions. */
+// #define BLACK 0  /**< Color value for an unlit pixel for draw functions. */
+// #define WHITE 1  /**< Color value for a lit pixel for draw functions. */
+
+#define	BLACK   0x0000
+#define	BLUE    0x001F
+#define	RED     0xF800
+#define	GREEN   0x07E0
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+
 /** \brief
  * Color value to indicate pixels are to be inverted.
  *
@@ -386,7 +396,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * specified color. The values WHITE or BLACK can be used for the color.
    * If the `color` parameter isn't included, the pixel will be set to WHITE.
    */
-  void drawPixel(int16_t x, int16_t y, uint8_t color = WHITE);
+  void drawPixel(int16_t x, int16_t y, uint16_t color = WHITE);
 
   /** \brief
    * Returns the state of the given pixel in the screen buffer.
@@ -406,11 +416,11 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the circle in pixels.
    * \param color The circle's color (optional; defaults to WHITE).
    */
-  void drawCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color = WHITE);
+  void drawCircle(int16_t x0, int16_t y0, uint8_t r, uint16_t color = WHITE);
 
   // Draw one or more "corners" of a circle.
   // (Not officially part of the API)
-  void drawCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t corners, uint8_t color = WHITE);
+  void drawCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t corners, uint16_t color = WHITE);
 
   /** \brief
    * Draw a filled-in circle of a given radius.
@@ -420,12 +430,12 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the circle in pixels.
    * \param color The circle's color (optional; defaults to WHITE).
    */
-  void fillCircle(int16_t x0, int16_t y0, uint8_t r, uint8_t color = WHITE);
+  void fillCircle(int16_t x0, int16_t y0, uint8_t r, uint16_t color = WHITE);
 
   // Draw one or both vertical halves of a filled-in circle or
   // rounded rectangle edge.
   // (Not officially part of the API)
-  void fillCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t sides, int16_t delta, uint8_t color = WHITE);
+  void fillCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t sides, int16_t delta, uint16_t color = WHITE);
 
   /** \brief
    * Draw a line between two specified points.
@@ -439,7 +449,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * Bresenham's algorithm.
    * The start and end points can be at any location with respect to the other.
    */
-  void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint8_t color = WHITE);
+  void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color = WHITE);
 
   /** \brief
    * Draw a rectangle of a specified width and height.
@@ -450,7 +460,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param h The height of the rectangle.
    * \param color The color of the pixel (optional; defaults to WHITE).
    */
-  void drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color = WHITE);
+  void drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint16_t color = WHITE);
 
   /** \brief
    * Draw a vertical line.
@@ -460,7 +470,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param h The height of the line.
    * \param color The color of the line (optional; defaults to WHITE).
    */
-  void drawFastVLine(int16_t x, int16_t y, uint8_t h, uint8_t color = WHITE);
+  void drawFastVLine(int16_t x, int16_t y, uint8_t h, uint16_t color = WHITE);
 
   /** \brief
    * Draw a horizontal line.
@@ -470,7 +480,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param w The width of the line.
    * \param color The color of the line (optional; defaults to WHITE).
    */
-  void drawFastHLine(int16_t x, int16_t y, uint8_t w, uint8_t color = WHITE);
+  void drawFastHLine(int16_t x, int16_t y, uint8_t w, uint16_t color = WHITE);
 
   /** \brief
    * Draw a filled-in rectangle of a specified width and height.
@@ -481,14 +491,14 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param h The height of the rectangle.
    * \param color The color of the pixel (optional; defaults to WHITE).
    */
-  void fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t color = WHITE);
+  void fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint16_t color = WHITE);
 
   /** \brief
    * Fill the screen buffer with the specified color.
    *
    * \param color The fill color (optional; defaults to WHITE).
    */
-  void fillScreen(uint8_t color = WHITE);
+  void fillScreen(uint16_t color = WHITE);
 
   /** \brief
    * Draw a rectangle with rounded corners.
@@ -500,7 +510,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the semicircles forming the corners.
    * \param color The color of the rectangle (optional; defaults to WHITE).
    */
-  void drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color = WHITE);
+  void drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color = WHITE);
 
   /** \brief
    * Draw a filled-in rectangle with rounded corners.
@@ -512,7 +522,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the semicircles forming the corners.
    * \param color The color of the rectangle (optional; defaults to WHITE).
    */
-  void fillRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint8_t color = WHITE);
+  void fillRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color = WHITE);
 
   /** \brief
    * Draw a triangle given the coordinates of each corner.
@@ -525,7 +535,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * A triangle is drawn by specifying each of the three corner locations.
    * The corners can be at any position with respect to the others.
    */
-  void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color = WHITE);
+  void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color = WHITE);
 
   /** \brief
    * Draw a filled-in triangle given the coordinates of each corner.
@@ -538,7 +548,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * A triangle is drawn by specifying each of the three corner locations.
    * The corners can be at any position with respect to the others.
    */
-  void fillTriangle (int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint8_t color = WHITE);
+  void fillTriangle (int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color = WHITE);
 
   /** \brief
    * Draw a bitmap from an array in program memory.
@@ -562,7 +572,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * The array must be located in program memory by using the PROGMEM modifier.
    */
-  static void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint8_t color = WHITE);
+  static void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint16_t color = WHITE);
 
   /** \brief
    * Draw a bitmap from a horizontally oriented array in program memory.
@@ -591,7 +601,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * that allows them to be directly written to the screen. It is recommended
    * you use `drawBitmap()` when possible.
    */
-  void drawSlowXYBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint8_t color = WHITE);
+  void drawSlowXYBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint16_t color = WHITE);
 
   /** \brief
    * Draw a bitmap from an array of compressed data.
@@ -615,7 +625,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * The array must be located in program memory by using the PROGMEM modifier.
    */
-  static void drawCompressed(int16_t sx, int16_t sy, const uint8_t *bitmap, uint8_t color = WHITE);
+  static void drawCompressed(int16_t sx, int16_t sy, const uint8_t *bitmap, uint16_t color = WHITE);
 
   /** \brief
    * Get a pointer to the display buffer in RAM.
@@ -634,7 +644,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * \see sBuffer
    */
-  uint8_t* getBuffer();
+  uint16_t* getBuffer();
 
   /** \brief
    * Seed the random number generator with a random value.
@@ -1102,7 +1112,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * \see getBuffer()
    */
-  static uint8_t sBuffer[(HEIGHT*WIDTH)/8];
+  static uint16_t sBuffer[(HEIGHT*WIDTH)];
 
  protected:
   // helper function for sound enable/disable system control

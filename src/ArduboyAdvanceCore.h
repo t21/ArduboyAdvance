@@ -11,6 +11,9 @@
 // #include <avr/power.h>
 // #include <avr/sleep.h>
 #include <limits.h>
+#include "Adafruit_ILI9340_defs.h"
+
+
 
 
 // main hardware compile flags
@@ -39,23 +42,25 @@
 // ----- Arduboy 2.0 pins -----
 #ifdef ARDUBOY_20
 
-#define PIN_CS 12       // Display CS Arduino pin number
-#define CS_PORT 0 //PORTD   // Display CS port
-#define CS_BIT 0 //PORTD6   // Display CS physical bit number
+#define PIN_CS A1       // Display CS Arduino pin number
+// #define CS_PORT 0 //PORTD   // Display CS port
+// #define CS_BIT 0 //PORTD6   // Display CS physical bit number
 
-#define PIN_DC 4        // Display D/C Arduino pin number
-#define DC_PORT 0 //PORTD   // Display D/C port
-#define DC_BIT 0 //PORTD4   // Display D/C physical bit number
+#define PIN_DC 7        // Display D/C Arduino pin number
+// #define DC_PORT 0 //PORTD   // Display D/C port
+// #define DC_BIT 0 //PORTD4   // Display D/C physical bit number
 
 #define PIN_RST 6       // Display reset Arduino pin number
-#define RST_PORT 1 //PORTD  // Display reset port
-#define RST_BIT 1 //PORTD7  // Display reset physical bit number
+// #define RST_PORT 1 //PORTD  // Display reset port
+// #define RST_BIT 1 //PORTD7  // Display reset physical bit number
 
-#define SPI_MOSI_PORT 0 //PORTB
-#define SPI_MOSI_BIT 0 //PORTB2
+// #define SPI_MOSI_PORT 0 //PORTB
+// #define SPI_MOSI_BIT 0 //PORTB2
 
-#define SPI_SCK_PORT 0 //PORTB
-#define SPI_SCK_BIT 0 //PORTB1
+// #define PIN_SCK 9
+#define PIN_SCK 0
+// #define SPI_SCK_PORT 0 //PORTB
+// #define SPI_SCK_BIT 0 //PORTB1
 
 #define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
 #define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
@@ -117,173 +122,173 @@
 // -----------------------
 
 // ----- Arduboy 1.0 pins -----
-#elif defined(ARDUBOY_10)
+// #elif defined(ARDUBOY_10)
 
-#define PIN_CS 12       // Display CS Arduino pin number
-#define CS_PORT PORTD   // Display CS port
-#define CS_BIT PORTD6   // Display CS physical bit number
+// #define PIN_CS 12       // Display CS Arduino pin number
+// #define CS_PORT PORTD   // Display CS port
+// #define CS_BIT PORTD6   // Display CS physical bit number
 
-#define PIN_DC 4        // Display D/C Arduino pin number
-#define DC_PORT PORTD   // Display D/C port
-#define DC_BIT PORTD4   // Display D/C physical bit number
+// #define PIN_DC 4        // Display D/C Arduino pin number
+// #define DC_PORT PORTD   // Display D/C port
+// #define DC_BIT PORTD4   // Display D/C physical bit number
 
-#define PIN_RST 6       // Display reset Arduino pin number
-#define RST_PORT PORTD  // Display reset port
-#define RST_BIT PORTD7  // Display reset physical bit number
+// #define PIN_RST 6       // Display reset Arduino pin number
+// #define RST_PORT PORTD  // Display reset port
+// #define RST_BIT PORTD7  // Display reset physical bit number
 
-#define SPI_MOSI_PORT PORTB
-#define SPI_MOSI_BIT PORTB2
+// #define SPI_MOSI_PORT PORTB
+// #define SPI_MOSI_BIT PORTB2
 
-#define SPI_SCK_PORT PORTB
-#define SPI_SCK_BIT PORTB1
+// #define SPI_SCK_PORT PORTB
+// #define SPI_SCK_BIT PORTB1
 
-#define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
-#define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
-#define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
+// #define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
+// #define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
+// #define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
 
-#define RED_LED_PORT PORTB
-#define RED_LED_BIT PORTB6
+// #define RED_LED_PORT PORTB
+// #define RED_LED_BIT PORTB6
 
-#define GREEN_LED_PORT PORTB
-#define GREEN_LED_BIT PORTB7
+// #define GREEN_LED_PORT PORTB
+// #define GREEN_LED_BIT PORTB7
 
-#define BLUE_LED_PORT PORTB
-#define BLUE_LED_BIT PORTB5
+// #define BLUE_LED_PORT PORTB
+// #define BLUE_LED_BIT PORTB5
 
-// bit values for button states
-// these are determined by the buttonsState() function
-#define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
-// #define LEFT_BUTTON _BV(5)  /**< The Left button value for functions requiring a bitmask */
-#define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
-// #define RIGHT_BUTTON _BV(6) /**< The Right button value for functions requiring a bitmask */
-#define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
-// #define UP_BUTTON _BV(7)    /**< The Up button value for functions requiring a bitmask */
-#define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
-// #define DOWN_BUTTON _BV(4)  /**< The Down button value for functions requiring a bitmask */
-#define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
-// #define A_BUTTON _BV(3)     /**< The A button value for functions requiring a bitmask */
-#define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
-// #define B_BUTTON _BV(2)     /**< The B button value for functions requiring a bitmask */
+// // bit values for button states
+// // these are determined by the buttonsState() function
+// #define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
+// // #define LEFT_BUTTON _BV(5)  /**< The Left button value for functions requiring a bitmask */
+// #define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
+// // #define RIGHT_BUTTON _BV(6) /**< The Right button value for functions requiring a bitmask */
+// #define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
+// // #define UP_BUTTON _BV(7)    /**< The Up button value for functions requiring a bitmask */
+// #define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
+// // #define DOWN_BUTTON _BV(4)  /**< The Down button value for functions requiring a bitmask */
+// #define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
+// // #define A_BUTTON _BV(3)     /**< The A button value for functions requiring a bitmask */
+// #define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
+// // #define B_BUTTON _BV(2)     /**< The B button value for functions requiring a bitmask */
 
-#define PIN_LEFT_BUTTON A2
-#define LEFT_BUTTON_PORT PORTF
-#define LEFT_BUTTON_BIT PORTF5
+// #define PIN_LEFT_BUTTON A2
+// #define LEFT_BUTTON_PORT PORTF
+// #define LEFT_BUTTON_BIT PORTF5
 
-#define PIN_RIGHT_BUTTON A1
-#define RIGHT_BUTTON_PORT PORTF
-#define RIGHT_BUTTON_BIT PORTF6
+// #define PIN_RIGHT_BUTTON A1
+// #define RIGHT_BUTTON_PORT PORTF
+// #define RIGHT_BUTTON_BIT PORTF6
 
-#define PIN_UP_BUTTON A0
-#define UP_BUTTON_PORT PORTF
-#define UP_BUTTON_BIT PORTF7
+// #define PIN_UP_BUTTON A0
+// #define UP_BUTTON_PORT PORTF
+// #define UP_BUTTON_BIT PORTF7
 
-#define PIN_DOWN_BUTTON A3
-#define DOWN_BUTTON_PORT PORTF
-#define DOWN_BUTTON_BIT PORTF4
+// #define PIN_DOWN_BUTTON A3
+// #define DOWN_BUTTON_PORT PORTF
+// #define DOWN_BUTTON_BIT PORTF4
 
-#define PIN_A_BUTTON 7
-#define A_BUTTON_PORT PORTE
-#define A_BUTTON_BIT PORTE6
+// #define PIN_A_BUTTON 7
+// #define A_BUTTON_PORT PORTE
+// #define A_BUTTON_BIT PORTE6
 
-#define PIN_B_BUTTON 8
-#define B_BUTTON_PORT PORTB
-#define B_BUTTON_BIT PORTB4
+// #define PIN_B_BUTTON 8
+// #define B_BUTTON_PORT PORTB
+// #define B_BUTTON_BIT PORTB4
 
-#define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
-#define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
+// #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
+// #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
 
-#define SPEAKER_1_PORT PORTC
-#define SPEAKER_1_DDR DDRC
-#define SPEAKER_1_BIT PORTC6
+// #define SPEAKER_1_PORT PORTC
+// #define SPEAKER_1_DDR DDRC
+// #define SPEAKER_1_BIT PORTC6
 
-#define SPEAKER_2_PORT PORTC
-#define SPEAKER_2_DDR DDRC
-#define SPEAKER_2_BIT PORTC7
+// #define SPEAKER_2_PORT PORTC
+// #define SPEAKER_2_DDR DDRC
+// #define SPEAKER_2_BIT PORTC7
 
-#define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
-#define RAND_SEED_IN_PORTF
-#define RAND_SEED_IN_BIT PORTF1
-// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
-#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
+// #define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
+// #define RAND_SEED_IN_PORTF
+// #define RAND_SEED_IN_BIT PORTF1
+// // Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+// #define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
 // -----------------------
 
 // ----- DevKit pins -----
-#elif defined(AB_DEVKIT)
+// #elif defined(AB_DEVKIT)
 
-#define PIN_CS 6        // Display CS Arduino pin number
-#define CS_PORT PORTD   // Display CS port
-#define CS_BIT PORTD7   // Display CS physical bit number
+// #define PIN_CS 6        // Display CS Arduino pin number
+// #define CS_PORT PORTD   // Display CS port
+// #define CS_BIT PORTD7   // Display CS physical bit number
 
-#define PIN_DC 4        // Display D/C Arduino pin number
-#define DC_PORT PORTD   // Display D/C port
-#define DC_BIT PORTD4   // Display D/C physical bit number
+// #define PIN_DC 4        // Display D/C Arduino pin number
+// #define DC_PORT PORTD   // Display D/C port
+// #define DC_BIT PORTD4   // Display D/C physical bit number
 
-#define PIN_RST 12      // Display reset Arduino pin number
-#define RST_PORT PORTD  // Display reset port
-#define RST_BIT PORTD6  // Display reset physical bit number
+// #define PIN_RST 12      // Display reset Arduino pin number
+// #define RST_PORT PORTD  // Display reset port
+// #define RST_BIT PORTD6  // Display reset physical bit number
 
-#define SPI_MOSI_PORT PORTB
-#define SPI_MOSI_BIT PORTB2
+// #define SPI_MOSI_PORT PORTB
+// #define SPI_MOSI_BIT PORTB2
 
-#define SPI_SCK_PORT PORTB
-#define SPI_SCK_BIT PORTB1
+// #define SPI_SCK_PORT PORTB
+// #define SPI_SCK_BIT PORTB1
 
-// map all LEDs to the single TX LED on DEVKIT
-#define RED_LED 17
-#define GREEN_LED 17
-#define BLUE_LED 17
+// // map all LEDs to the single TX LED on DEVKIT
+// #define RED_LED 17
+// #define GREEN_LED 17
+// #define BLUE_LED 17
 
-#define BLUE_LED_PORT PORTB
-#define BLUE_LED_BIT PORTB0
+// #define BLUE_LED_PORT PORTB
+// #define BLUE_LED_BIT PORTB0
 
-// bit values for button states
-// these are determined by the buttonsState() function
-#define LEFT_BUTTON _BV(5)
-#define RIGHT_BUTTON _BV(2)
-#define UP_BUTTON _BV(4)
-#define DOWN_BUTTON _BV(6)
-#define A_BUTTON _BV(1)
-#define B_BUTTON _BV(0)
+// // bit values for button states
+// // these are determined by the buttonsState() function
+// #define LEFT_BUTTON _BV(5)
+// #define RIGHT_BUTTON _BV(2)
+// #define UP_BUTTON _BV(4)
+// #define DOWN_BUTTON _BV(6)
+// #define A_BUTTON _BV(1)
+// #define B_BUTTON _BV(0)
 
-// pin values for buttons, probably shouldn't use these
-#define PIN_LEFT_BUTTON 9
-#define LEFT_BUTTON_PORT PORTB
-#define LEFT_BUTTON_BIT PORTB5
+// // pin values for buttons, probably shouldn't use these
+// #define PIN_LEFT_BUTTON 9
+// #define LEFT_BUTTON_PORT PORTB
+// #define LEFT_BUTTON_BIT PORTB5
 
-#define PIN_RIGHT_BUTTON 5
-#define RIGHT_BUTTON_PORT PORTC
-#define RIGHT_BUTTON_BIT PORTC6
+// #define PIN_RIGHT_BUTTON 5
+// #define RIGHT_BUTTON_PORT PORTC
+// #define RIGHT_BUTTON_BIT PORTC6
 
-#define PIN_UP_BUTTON 8
-#define UP_BUTTON_PORT PORTB
-#define UP_BUTTON_BIT PORTB4
+// #define PIN_UP_BUTTON 8
+// #define UP_BUTTON_PORT PORTB
+// #define UP_BUTTON_BIT PORTB4
 
-#define PIN_DOWN_BUTTON 10
-#define DOWN_BUTTON_PORT PORTB
-#define DOWN_BUTTON_BIT PORTB6
+// #define PIN_DOWN_BUTTON 10
+// #define DOWN_BUTTON_PORT PORTB
+// #define DOWN_BUTTON_BIT PORTB6
 
-#define PIN_A_BUTTON A0
-#define A_BUTTON_PORT PORTF
-#define A_BUTTON_BIT PORTF7
+// #define PIN_A_BUTTON A0
+// #define A_BUTTON_PORT PORTF
+// #define A_BUTTON_BIT PORTF7
 
-#define PIN_B_BUTTON A1
-#define B_BUTTON_PORT PORTF
-#define B_BUTTON_BIT PORTF6
+// #define PIN_B_BUTTON A1
+// #define B_BUTTON_PORT PORTF
+// #define B_BUTTON_BIT PORTF6
 
-#define PIN_SPEAKER_1 A2
-#define SPEAKER_1_PORT PORTF
-#define SPEAKER_1_DDR DDRF
-#define SPEAKER_1_BIT PORTF5
-// SPEAKER_2 is purposely not defined for DEVKIT as it could potentially
-// be dangerous and fry your hardware (because of the devkit wiring).
-//
-// Reference: https://github.com/Arduboy/Arduboy/issues/108
+// #define PIN_SPEAKER_1 A2
+// #define SPEAKER_1_PORT PORTF
+// #define SPEAKER_1_DDR DDRF
+// #define SPEAKER_1_BIT PORTF5
+// // SPEAKER_2 is purposely not defined for DEVKIT as it could potentially
+// // be dangerous and fry your hardware (because of the devkit wiring).
+// //
+// // Reference: https://github.com/Arduboy/Arduboy/issues/108
 
-#define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
-#define RAND_SEED_IN_PORTF
-#define RAND_SEED_IN_BIT PORTF1
-// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
-#define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
+// #define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
+// #define RAND_SEED_IN_PORTF
+// #define RAND_SEED_IN_BIT PORTF1
+// // Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+// #define RAND_SEED_IN_ADMUX (_BV(REFS0) | _BV(REFS1) | _BV(MUX0))
 
 #endif
 // --------------------
@@ -304,8 +309,11 @@
 
 // -----
 
-#define WIDTH 128 /**< The width of the display in pixels */
-#define HEIGHT 64 /**< The height of the display in pixels */
+// #define WIDTH 128 /**< The width of the display in pixels */
+// #define HEIGHT 64 /**< The height of the display in pixels */
+#define WIDTH 144 /**< The width of the display in pixels */
+// #define HEIGHT 320 /**< The height of the display in pixels */
+#define HEIGHT 100 /**< The height of the display in pixels */
 
 #define COLUMN_ADDRESS_END (WIDTH - 1) & 127   // 128 pixels wide
 #define PAGE_ADDRESS_END ((HEIGHT/8)-1) & 7    // 8 pages high
@@ -436,7 +444,7 @@ class ArduboyAdvanceCore
      * In most cases, the defined value `WIDTH` would be better to use instead
      * of this function.
      */
-    uint8_t static width();
+    uint16_t static width();
 
     /** \brief
      * Get the height of the display in pixels.
@@ -447,7 +455,7 @@ class ArduboyAdvanceCore
      * In most cases, the defined value `HEIGHT` would be better to use instead
      * of this function.
      */
-    uint8_t static height();
+    uint16_t static height();
 
     /** \brief
      * Get the current state of all buttons as a bitmask.
@@ -512,7 +520,7 @@ class ArduboyAdvanceCore
      *
      * \see paint8Pixels()
      */
-    void static paintScreen(const uint8_t *image);
+    void static paintScreen(const uint16_t *image);
 
     /** \brief
      * Paints an entire image directly to the display from an array in RAM.
@@ -536,7 +544,7 @@ class ArduboyAdvanceCore
      *
      * \see paint8Pixels()
      */
-    void static paintScreen(uint8_t image[], bool clear = false);
+    void static paintScreen(uint16_t image[], bool clear = false);
 
     /** \brief
      * Blank the display screen by setting all pixels off.
@@ -741,7 +749,8 @@ class ArduboyAdvanceCore
      * \see Arduboy2Base::begin()
      */
     void static boot();
-
+    // void boot();
+    
     /** \brief
      * Allow upload when the bootloader "magic number" could be corrupted.
      *
@@ -776,6 +785,17 @@ class ArduboyAdvanceCore
      */
     void static delayShort(uint16_t ms) __attribute__ ((noinline));
 
+
+    // ToDo: Remove again
+    void static fillScreen2(uint16_t color);
+    // ToDo: Remove again
+    // fill a rectangle
+    void static fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+    // ToDo: Remove?
+    void static setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+
+    void static spiwrite(uint8_t);
+    
   protected:
     // internals
     void static setCPUSpeed8MHz();
@@ -783,6 +803,32 @@ class ArduboyAdvanceCore
     void static bootOLED();
     void static bootPins();
     void static bootPowerSaving();
-};
+    void static bootTFT();
+    // void bootTFT();
+
+    bool static waitForDMA();
+  
+    void static writecommand(uint8_t c);
+    void static writedata(uint8_t c);
+    uint8_t static readcommand8(uint8_t c);
+
+
+    // volatile uint8_t *mosiport, *clkport, *dcport, *rsport, *csport;
+    const uint8_t  static _cs   = A1;
+    const uint8_t  static _dc   = 7;
+    const uint8_t  static _rst  = 6;
+    const uint8_t  static _mosi  = 0;
+    const uint8_t  static _sclk = 0;
+    const int16_t  static _width  = ILI9340_TFTWIDTH;
+    const int16_t  static _height = ILI9340_TFTHEIGHT;
+
+    // DMA dma = new DMA();
+  
+    // uint8_t  static _cs, _dc, _rst, _mosi, _miso, _sclk,
+    //          mosipinmask, clkpinmask, cspinmask, dcpinmask;
+    // int16_t static _width;
+    // int16_t static _height;
+           
+  };
 
 #endif
