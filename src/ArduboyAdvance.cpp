@@ -528,6 +528,15 @@ void ArduboyAdvanceBase::drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, ui
 
 void ArduboyAdvanceBase::drawFastVLine(int16_t x, int16_t y, uint16_t h, uint16_t color)
 {
+  uint16_t len = h - y;
+  uint32_t startPixel = x + y * WIDTH;
+
+  for (int i = 0; i < len; i++) {
+    sBuffer[startPixel + i * WIDTH] = color;
+  }
+
+  return;
+  
   int end = y+h;
   for (int a = max(0,y); a < min(end,HEIGHT); a++)
   {
