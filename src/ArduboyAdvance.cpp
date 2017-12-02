@@ -299,13 +299,15 @@ void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint16_t color)
   // row_offset = (row*WIDTH) + (uint8_t)x;
   // bit = _BV((uint8_t)y % 8);
 
+  pixel = x + y * WIDTH;
+
   // the above math can also be rewritten more simply as;
   //   row_offset = (y * WIDTH/8) & ~0b01111111 + (uint8_t)x;
   // which is what the below assembler does
 
   // local variable for the bitshift_left array pointer,
   // which can be declared a read-write operand
-  const uint8_t* bsl = bitshift_left;
+  // const uint8_t* bsl = bitshift_left;
 
   // asm volatile
   // (
@@ -331,9 +333,9 @@ void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint16_t color)
   // );
 
   if (color) {
-    sBuffer[row_offset] |=   bit;
+    sBuffer[pixel] = color;
   } else {
-    sBuffer[row_offset] &= ~ bit;
+    sBuffer[pixel] = BLACK;
   }
 }
 
