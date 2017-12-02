@@ -99,14 +99,14 @@
 //Joystick
 #define PIN_JOY_X_AXIS A5
 #define PIN_JOY_Y_AXIS A6
-#define JOY_X_THRESHOLD_LOW 2000
+/* #define JOY_X_THRESHOLD_LOW 2000
 #define JOY_Y_THRESHOLD_LOW 2020
 #define JOY_X_THRESHOLD_HIGH 2080
 #define JOY_Y_THRESHOLD_HIGH 2060
 #define JOY_X_THRESHOLD_SCALED_LOW -3
 #define JOY_Y_THRESHOLD_SCALED_LOW -2
 #define JOY_X_THRESHOLD_SCALED_HIGH 0
-#define JOY_Y_THRESHOLD_SCALED_HIGH 0 //Maybe 1
+#define JOY_Y_THRESHOLD_SCALED_HIGH 0 //Maybe 1*/
 
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
@@ -793,6 +793,16 @@ class ArduboyAdvanceCore
     void static bootOLED();
     void static bootPins();
     void static bootPowerSaving();
+    bool static calibrateJoy();
+    static bool joyCalibrated;
+    static int JOY_X_THRESHOLD_LOW;
+    static int JOY_Y_THRESHOLD_LOW; 
+    static int JOY_X_THRESHOLD_HIGH; 
+    static int JOY_Y_THRESHOLD_HIGH;
+    static int JOY_X_THRESHOLD_SCALED_LOW; 
+    static int JOY_Y_THRESHOLD_SCALED_LOW; 
+    static int JOY_X_THRESHOLD_SCALED_HIGH;
+    static int JOY_Y_THRESHOLD_SCALED_HIGH; 
 };
 
 #endif

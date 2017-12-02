@@ -87,6 +87,10 @@ void ArduboyAdvanceCore::boot()
   bootSPI();
   bootOLED();
   bootPowerSaving();
+
+  //Calibration
+  joyCalibrated = false;
+  calibrateJoy();
 }
 
 #ifdef ARDUBOY_SET_CPU_8MHZ
@@ -501,5 +505,36 @@ uint8_t ArduboyAdvanceCore::buttonsState()
 void ArduboyAdvanceCore::delayShort(uint16_t ms)
 {
   delay((unsigned long) ms);
+}
+
+bool static ArduboyAdvanceCore::calibrateJoy() {
+  if (!calibrated) {
+    int xmid = analogRead(PIN_X_AXIS);
+    int ymid = analogRead(PIN_Y_AXIS);   
+
+    delay(20); //2 Readings for more accurate result
+
+    int xmid1 = analogRead(PIN_X_AXIS);
+    int ymid1 = analogRead(PIN_Y_AXIS);   
+    calibrated = true;
+    
+    JOY_X_THRESHOLD_LOW = (xmid+xmid1)/2 - JOY_THRESHOLD;
+    JOY_X_THRESHOLD_HIGH = (xmid+xmid1)/2 + JOY_THRESHOLD;
+
+    JOY_Y_THRESHOLD_LOW = (ymid+ymid1)/2 - JOY_THRESHOLD;
+    JOY_Y_THRESHOLD_HIGH = (ymid+ymid1)/2 + JOY_THRESHOLD;
+
+    JOY_X_THRESHOLD_SCALED_LOW = map((xmid+xmid1)/2,0,pow(2,A_READ_BITS),0,100) - JOY_THRESHOLD_SCALED;
+    JOY_X_THRESHOLD_SCALED_HIGH = map((xmid+xmid1)/2,0,pow(2,A_READ_BITS),0,100) + JOY_THRESHOLD_SCALED; 
+
+    JOY_Y_THRESHOLD_SCALED_LOW = map((ymid+ymid1)/2,0,pow(2,A_READ_BITS),0,100) - JOY_THRESHOLD_SCALED;
+    JOY_Y_THRESHOLD_SCALED_HIGH = map((ymid+ymid1)/2,0,pow(2,A_READ_BITS),0,100) + JOY_THRESHOLD_SCALED;
+  } 
+
+  if (calibrated) {
+    return true;
+  } else {
+    return false;
+  }  
 }
 
