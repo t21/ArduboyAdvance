@@ -606,14 +606,14 @@ void ArduboyAdvanceCore::paintScreen(uint16_t image[], bool clear)
   writecommand(ILI9340_CASET); // Column addr set
   writedata(0 >> 8);
   writedata(0 & 0xFF);     // XSTART
-  writedata(WIDTH >> 8);
-  writedata(WIDTH & 0xFF);     // XEND
+  writedata((WIDTH - 1) >> 8);
+  writedata((WIDTH - 1) & 0xFF);     // XEND
 
   writecommand(ILI9340_PASET); // Row addr set
   writedata(0>>8);
   writedata(0);     // YSTART
-  writedata(HEIGHT>>8);
-  writedata(HEIGHT);     // YEND
+  writedata((HEIGHT - 1) >>8);
+  writedata(HEIGHT - 1);     // YEND
 
   writecommand(ILI9340_RAMWR); // write to RAM
 
