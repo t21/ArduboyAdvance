@@ -71,13 +71,23 @@
 // #define WHITE 1  /**< Color value for a lit pixel for draw functions. */
 
 #define	BLACK   0x0000
-#define	BLUE    0x001F
-#define	RED     0xF800
-#define	GREEN   0x07E0
+// #define	BLUE    0x001F
+// #define	RED     0xF800
+// #define	GREEN   0x07E0
+// #define CYAN    0x07FF
+// #define MAGENTA 0xF81F
+// #define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+
+#define	GREEN    0x0020
+#define	BLUE     0xF800
+#define	RED   0x07E0
 #define CYAN    0x07FF
 #define MAGENTA 0xF81F
 #define YELLOW  0xFFE0
-#define WHITE   0xFFFF
+
+#define TEST_COLOR 0x0010
+
 
 /** \brief
  * Color value to indicate pixels are to be inverted.
@@ -202,6 +212,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see boot()
    */
   void begin();
+  // Not fully ready
 
   /** \brief
    * Turn the RGB LED and display fully on to act as a small flashlight/torch.
@@ -230,6 +241,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see begin() boot() safeMode()
    */
   void flashlight();
+  // Not tested
 
   /** \brief
    * Handle buttons held on startup for system control.
@@ -248,6 +260,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see begin() boot()
    */
   void systemButtons();
+  // Not tested
 
   /** \brief
    * Display the boot logo sequence using `drawBitmap()`.
@@ -272,6 +285,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * Arduboy2::bootLogoText()
    */
   void bootLogo();
+  // Not tested
 
   /** \brief
    * Display the boot logo sequence using `drawCompressed()`.
@@ -284,6 +298,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see bootLogo() begin() boot()
    */
   void bootLogoCompressed();
+  // Not tested
 
   /** \brief
    * Display the boot logo sequence using the `Sprites` class
@@ -297,6 +312,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see bootLogo() begin() boot() Sprites
    */
   void bootLogoSpritesSelfMasked();
+  // Not tested
 
   /** \brief
    * Display the boot logo sequence using the `Sprites` class
@@ -310,6 +326,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see bootLogo() begin() boot() Sprites
    */
   void bootLogoSpritesOverwrite();
+  // Not tested
 
   /** \brief
    * Display the boot logo sequence using the provided function
@@ -338,10 +355,12 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see bootLogo() boot()
    */
   void bootLogoShell(void (*drawLogo)(int16_t));
+  // Not tested
 
   // Called by bootLogoShell() to allow derived classes to display additional
   // information after the logo stops scrolling down.
   virtual void bootLogoExtra();
+  // Not tested
 
   /** \brief
    * Clear the display buffer.
@@ -363,6 +382,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \see display(bool)
    */
   void display();
+  // Needs implementation
 
   /** \brief
    * Copy the contents of the display buffer to the display. The display buffer
@@ -406,7 +426,8 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * \return WHITE if the pixel is on or BLACK if the pixel is off.
    */
-  uint8_t getPixel(uint8_t x, uint8_t y);
+  uint16_t getPixel(uint16_t x, uint16_t y);
+  // Not tested
 
   /** \brief
    * Draw a circle of a given radius.
@@ -416,11 +437,13 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the circle in pixels.
    * \param color The circle's color (optional; defaults to WHITE).
    */
-  void drawCircle(int16_t x0, int16_t y0, uint8_t r, uint16_t color = WHITE);
+  void drawCircle(int16_t x0, int16_t y0, uint16_t r, uint16_t color = WHITE);
+  // Not tested
 
   // Draw one or more "corners" of a circle.
   // (Not officially part of the API)
-  void drawCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t corners, uint16_t color = WHITE);
+  void drawCircleHelper(int16_t x0, int16_t y0, uint16_t r, uint16_t corners, uint16_t color = WHITE);
+  // Not tested
 
   /** \brief
    * Draw a filled-in circle of a given radius.
@@ -430,12 +453,14 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the circle in pixels.
    * \param color The circle's color (optional; defaults to WHITE).
    */
-  void fillCircle(int16_t x0, int16_t y0, uint8_t r, uint16_t color = WHITE);
+  void fillCircle(int16_t x0, int16_t y0, uint16_t r, uint16_t color = WHITE);
+  // Not tested
 
   // Draw one or both vertical halves of a filled-in circle or
   // rounded rectangle edge.
   // (Not officially part of the API)
-  void fillCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t sides, int16_t delta, uint16_t color = WHITE);
+  void fillCircleHelper(int16_t x0, int16_t y0, uint16_t r, uint16_t sides, int16_t delta, uint16_t color = WHITE);
+  // Not tested
 
   /** \brief
    * Draw a line between two specified points.
@@ -450,6 +475,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * The start and end points can be at any location with respect to the other.
    */
   void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color = WHITE);
+  // Is color correct?
 
   /** \brief
    * Draw a rectangle of a specified width and height.
@@ -460,7 +486,8 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param h The height of the rectangle.
    * \param color The color of the pixel (optional; defaults to WHITE).
    */
-  void drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint16_t color = WHITE);
+  void drawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t color = WHITE);
+  // Is color correct?
 
   /** \brief
    * Draw a vertical line.
@@ -1112,7 +1139,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * \see getBuffer()
    */
-  static uint16_t sBuffer[(HEIGHT*WIDTH)];
+  static uint16_t sBuffer[HEIGHT * WIDTH];
 
  protected:
   // helper function for sound enable/disable system control
@@ -1129,11 +1156,11 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
   uint8_t previousButtonState;
 
   // For frame funcions
-  uint8_t eachFrameMillis;
+  uint16_t eachFrameMillis;
   unsigned long lastFrameStart;
   unsigned long nextFrameStart;
   bool justRendered;
-  uint8_t lastFrameDurationMs;
+  uint16_t lastFrameDurationMs;
 };
 
 

@@ -271,7 +271,7 @@ void ArduboyAdvanceBase::initRandomSeed()
 
 void ArduboyAdvanceBase::clear()
 {
-  fillScreen(BLACK);
+    fillScreen(BLACK);
 }
 
 
@@ -286,14 +286,14 @@ const uint8_t bitshift_left[] PROGMEM = {
 void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
   // #ifdef PIXEL_SAFE_MODE
-  if (x < 0 || x > (WIDTH-1) || y < 0 || y > (HEIGHT-1))
+  if (x < 0 || x > (WIDTH - 1) || y < 0 || y > (HEIGHT - 1))
   {
     return;
   }
   // #endif
 
-  uint16_t row_offset;
-  uint8_t bit;
+  // uint16_t row_offset;
+  // uint8_t bit;
 
   // uint8_t row = (uint8_t)y / 8;
   // row_offset = (row*WIDTH) + (uint8_t)x;
@@ -339,14 +339,17 @@ void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint16_t color)
   }
 }
 
-uint8_t ArduboyAdvanceBase::getPixel(uint8_t x, uint8_t y)
+uint16_t ArduboyAdvanceBase::getPixel(uint16_t x, uint16_t y)
 {
-  uint8_t row = y / 8;
-  uint8_t bit_position = y % 8;
-  return (sBuffer[(row*WIDTH) + x] & (1 << bit_position)) >> bit_position;
+  // uint8_t row = y / 8;
+  // uint8_t bit_position = y % 8;
+
+    return (sBuffer[x + y * WIDTH]);
+  
+  // return (sBuffer[(row*WIDTH) + x] & (1 << bit_position)) >> bit_position;
 }
 
-void ArduboyAdvanceBase::drawCircle(int16_t x0, int16_t y0, uint8_t r, uint16_t color)
+void ArduboyAdvanceBase::drawCircle(int16_t x0, int16_t y0, uint16_t r, uint16_t color)
 {
   int16_t f = 1 - r;
   int16_t ddF_x = 1;
@@ -383,7 +386,7 @@ void ArduboyAdvanceBase::drawCircle(int16_t x0, int16_t y0, uint8_t r, uint16_t 
   }
 }
 
-void ArduboyAdvanceBase::drawCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t corners, uint16_t color)
+void ArduboyAdvanceBase::drawCircleHelper(int16_t x0, int16_t y0, uint16_t r, uint16_t corners, uint16_t color)
 {
   int16_t f = 1 - r;
   int16_t ddF_x = 1;
@@ -427,13 +430,13 @@ void ArduboyAdvanceBase::drawCircleHelper(int16_t x0, int16_t y0, uint8_t r, uin
   }
 }
 
-void ArduboyAdvanceBase::fillCircle(int16_t x0, int16_t y0, uint8_t r, uint16_t color)
+void ArduboyAdvanceBase::fillCircle(int16_t x0, int16_t y0, uint16_t r, uint16_t color)
 {
   drawFastVLine(x0, y0-r, 2*r+1, color);
   fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
-void ArduboyAdvanceBase::fillCircleHelper(int16_t x0, int16_t y0, uint8_t r, uint8_t sides, int16_t delta, uint16_t color)
+void ArduboyAdvanceBase::fillCircleHelper(int16_t x0, int16_t y0, uint16_t r, uint16_t sides, int16_t delta, uint16_t color)
 {
   int16_t f = 1 - r;
   int16_t ddF_x = 1;
@@ -518,7 +521,7 @@ void ArduboyAdvanceBase::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1
   }
 }
 
-void ArduboyAdvanceBase::drawRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint16_t color)
+void ArduboyAdvanceBase::drawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t color)
 {
   drawFastHLine(x, y, w, color);
   drawFastHLine(x, y+h-1, w, color);
@@ -536,7 +539,7 @@ void ArduboyAdvanceBase::drawFastVLine(int16_t x, int16_t y, uint16_t h, uint16_
   }
 
   return;
-  
+
   int end = y+h;
   for (int a = max(0,y); a < min(end,HEIGHT); a++)
   {
@@ -1137,7 +1140,7 @@ void ArduboyAdvance::bootLogoText()
 
 void ArduboyAdvance::bootLogoExtra()
 {
-  uint8_t c;
+  // uint8_t c;
 
   // if (!readShowUnitNameFlag())
   // {

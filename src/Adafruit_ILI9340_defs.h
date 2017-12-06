@@ -37,8 +37,8 @@
 // #endif
 
 
-#define ILI9340_TFTWIDTH  242
-#define ILI9340_TFTHEIGHT 320
+// #define ILI9340_TFTWIDTH  242
+// #define ILI9340_TFTHEIGHT 320
 
 #define ILI9340_NOP     0x00
 #define ILI9340_SWRESET 0x01

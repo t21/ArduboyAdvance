@@ -6,7 +6,7 @@
 
 #include "ArduboyAdvanceCore.h"
 #include "pins_arduino.h"
-#include "spi_dma.h"
+// #include "spi_dma.h"
 #include <SPI.h>
 
 // #define USE_SPI_LIBRARY
@@ -288,7 +288,9 @@ void ArduboyAdvanceCore::bootTFT()
 // #endif    //SPI.setBitOrder(MSBFIRST);
     // SPI.setBitOrder(MSBFIRST);
     // SPI.setDataMode(SPI_MODE0);
-    spi_dma_init();
+
+    // spi_dma_init();
+
     // SPI.beginTransaction(SPISetting(8000000, MSBFIRST, SPI_MODE0));
     SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
   // } else {
@@ -622,12 +624,10 @@ void ArduboyAdvanceCore::paintScreen(uint16_t image[], bool clear)
   digitalWrite(_dc, HIGH);
   digitalWrite(_cs, LOW);
 
-    // SPI.transfer(image, (HEIGHT * WIDTH));
+    SPI.transfer(image, (HEIGHT * WIDTH));
 
-    // for (int i = 0; i < 24; ++i) {
-  spi_dma_write((uint8_t *)image, (HEIGHT * WIDTH), 0);
-  waitForDMA();
-    // }
+  // spi_dma_write((uint8_t *)image, (HEIGHT * WIDTH), 0);
+  // waitForDMA();
 
     // DMA dma;
     // dma.init();
@@ -686,10 +686,10 @@ void ArduboyAdvanceCore::paintScreen(uint16_t image[], bool clear)
   // while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
 }
 
-bool ArduboyAdvanceCore::waitForDMA()
-{
-    while (!spi_dma_done()) ;
-}
+// bool ArduboyAdvanceCore::waitForDMA()
+// {
+//     while (!spi_dma_done()) ;
+// }
 
 void ArduboyAdvanceCore::blank()
 {

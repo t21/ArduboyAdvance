@@ -311,9 +311,9 @@
 
 // #define WIDTH 128 /**< The width of the display in pixels */
 // #define HEIGHT 64 /**< The height of the display in pixels */
-#define WIDTH 144 /**< The width of the display in pixels */
+#define WIDTH 240 /**< The width of the display in pixels */
 // #define HEIGHT 320 /**< The height of the display in pixels */
-#define HEIGHT 100 /**< The height of the display in pixels */
+#define HEIGHT 320 /**< The height of the display in pixels */
 
 #define COLUMN_ADDRESS_END (WIDTH - 1) & 127   // 128 pixels wide
 #define PAGE_ADDRESS_END ((HEIGHT/8)-1) & 7    // 8 pages high
@@ -786,11 +786,6 @@ class ArduboyAdvanceCore
     void static delayShort(uint16_t ms) __attribute__ ((noinline));
 
 
-    // ToDo: Remove again
-    void static fillScreen2(uint16_t color);
-    // ToDo: Remove again
-    // fill a rectangle
-    void static fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
     // ToDo: Remove?
     void static setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 
@@ -804,7 +799,6 @@ class ArduboyAdvanceCore
     void static bootPins();
     void static bootPowerSaving();
     void static bootTFT();
-    // void bootTFT();
 
     bool static waitForDMA();
   
@@ -819,15 +813,8 @@ class ArduboyAdvanceCore
     const uint8_t  static _rst  = 6;
     const uint8_t  static _mosi  = 0;
     const uint8_t  static _sclk = 0;
-    const int16_t  static _width  = ILI9340_TFTWIDTH;
-    const int16_t  static _height = ILI9340_TFTHEIGHT;
-
-    // DMA dma = new DMA();
-  
-    // uint8_t  static _cs, _dc, _rst, _mosi, _miso, _sclk,
-    //          mosipinmask, clkpinmask, cspinmask, dcpinmask;
-    // int16_t static _width;
-    // int16_t static _height;
+    const int16_t  static _width  = WIDTH;
+    const int16_t  static _height = HEIGHT;
            
   };
 
