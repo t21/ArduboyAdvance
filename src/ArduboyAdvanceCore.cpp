@@ -128,7 +128,7 @@ void ArduboyAdvanceCore::boot()
 void ArduboyAdvanceCore::bootPins()
 {
 
-#ifdef ARDUBOY_20
+#if defined(ARDUBOY_20) || defined(ARDUBOY_36)
 
 pinMode(PIN_A_BUTTON, INPUT_PULLUP);
 pinMode(PIN_B_BUTTON, INPUT_PULLUP);
@@ -790,7 +790,7 @@ void ArduboyAdvanceCore::digitalWriteRGB(uint8_t color, uint8_t val)
 uint8_t ArduboyAdvanceCore::buttonsState()
 {
   uint8_t buttons;
-#ifdef ARDUBOY_20
+#if defined(ARDUBOY_20) || defined(ARDUBOY_36)
   uint8_t Abit;
   uint8_t Bbit;
   uint8_t Xbit;

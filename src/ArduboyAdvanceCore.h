@@ -31,7 +31,7 @@
  *     // #define ARDUBOY_10
  *     #define AB_DEVKIT
  */
-#define ARDUBOY_20   //< compile for the production Arduboy v2.0
+#define ARDUBOY_36   //< compile for the production Arduboy v2.0
 //#define ARDUBOY_10   //< compile for the production Arduboy v1.0
 // #define AB_DEVKIT    //< compile for the official dev kit
 #endif
@@ -39,8 +39,89 @@
 #define RGB_ON LOW   /**< For digitially setting an RGB LED on using digitalWriteRGB() */
 #define RGB_OFF HIGH /**< For digitially setting an RGB LED off using digitalWriteRGB() */
 
+// ----- Arduboy 3.6 pins -----
+#if defined(ARDUBOY_36)
+
+#define PIN_CS 23      // Display CS Arduino pin number
+// #define CS_PORT 0 //PORTD   // Display CS port
+// #define CS_BIT 0 //PORTD6   // Display CS physical bit number
+
+#define PIN_DC 16       // Display D/C Arduino pin number
+// #define DC_PORT 0 //PORTD   // Display D/C port
+// #define DC_BIT 0 //PORTD4   // Display D/C physical bit number
+
+#define PIN_RST 15       // Display reset Arduino pin number
+// #define RST_PORT 1 //PORTD  // Display reset port
+// #define RST_BIT 1 //PORTD7  // Display reset physical bit number
+
+// #define SPI_MOSI_PORT 0 //PORTB
+// #define SPI_MOSI_BIT 0 //PORTB2
+
+// #define PIN_SCK 9
+#define PIN_SCK 13
+// #define SPI_SCK_PORT 0 //PORTB
+// #define SPI_SCK_BIT 0 //PORTB1
+
+#define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
+#define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
+#define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
+
+#define RED_LED_PORT 0 //PORTB
+#define RED_LED_BIT 0 //PORTB6
+
+#define GREEN_LED_PORT 0 //PORTB
+#define GREEN_LED_BIT 0 //PORTB7
+
+#define BLUE_LED_PORT 0 //PORTB
+#define BLUE_LED_BIT 0 //PORTB5
+
+// bit values for button states
+// these are determined by the buttonsState() function
+#define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
+#define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
+#define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
+#define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
+#define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
+#define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
+#define X_BUTTON 0b00000010
+#define Y_BUTTON 0b00000001
+#define SEL_BUTTON 0b00010000
+
+//Button pins
+//#define PIN_LEFT_BUTTON A2
+//#define PIN_RIGHT_BUTTON A1
+//#define PIN_UP_BUTTON A0
+//#define PIN_DOWN_BUTTON A3
+#define PIN_A_BUTTON 19
+#define PIN_B_BUTTON 21
+#define PIN_X_BUTTON 22
+#define PIN_Y_BUTTON 20
+#define PIN_JOY_SEL_BUTTON 30
+
+//Joystick
+#define PIN_JOY_X_AXIS A12 //Inverted because to joystick is
+#define PIN_JOY_Y_AXIS A13
+
+
+#define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
+#define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
+
+#define SPEAKER_1_PORT 0 //PORTC
+#define SPEAKER_1_DDR 0 //DDRC
+#define SPEAKER_1_BIT 0 //PORTC6
+
+#define SPEAKER_2_PORT 0 //PORTC
+#define SPEAKER_2_DDR 0 //DDRC
+#define SPEAKER_2_BIT 0 //PORTC7
+
+#define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
+#define RAND_SEED_IN_PORTF
+#define RAND_SEED_IN_BIT 0 //PORTF1
+// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+#define RAND_SEED_IN_ADMUX ((1 << REFS0) | (1 << REFS1) | (1 << MUX0))
+
 // ----- Arduboy 2.0 pins -----
-#ifdef ARDUBOY_20
+#elif defined(ARDUBOY_20)
 
 #define PIN_CS A1       // Display CS Arduino pin number
 // #define CS_PORT 0 //PORTD   // Display CS port
@@ -808,10 +889,10 @@ class ArduboyAdvanceCore
 
 
     // volatile uint8_t *mosiport, *clkport, *dcport, *rsport, *csport;
-    const uint8_t  static _cs   = A1;
-    const uint8_t  static _dc   = 7;
-    const uint8_t  static _rst  = 6;
-    const uint8_t  static _mosi  = 0;
+    const uint8_t  static _cs   = PIN_CS;
+    const uint8_t  static _dc   = PIN_DC;
+    const uint8_t  static _rst  = PIN_RST;
+    const uint8_t  static _mosi = 0;
     const uint8_t  static _sclk = 0;
     const int16_t  static _width  = WIDTH;
     const int16_t  static _height = HEIGHT;
