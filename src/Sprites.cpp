@@ -245,8 +245,8 @@ void Sprites::drawBitmap(int16_t x, int16_t y,
       // *2 because we use double the bits (mask + bitmap)
       bofs = (uint8_t *)(bitmap + ((start_h * w) + xOffset) * 2);
 
-      uint8_t xi = rendered_width; // used for x loop below
-      uint8_t yi = loop_h; // used for y loop below
+      // uint8_t xi = rendered_width; // used for x loop below
+      // uint8_t yi = loop_h; // used for y loop below
 
       // asm volatile(
       //   "push r28\n" // save Y

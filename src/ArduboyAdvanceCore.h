@@ -58,7 +58,7 @@
 // #define SPI_MOSI_BIT 0 //PORTB2
 
 // #define PIN_SCK 9
-#define PIN_SCK 13
+#define PIN_SCK 0
 // #define SPI_SCK_PORT 0 //PORTB
 // #define SPI_SCK_BIT 0 //PORTB1
 
@@ -892,7 +892,7 @@ class ArduboyAdvanceCore
     const uint8_t  static _cs   = PIN_CS;
     const uint8_t  static _dc   = PIN_DC;
     const uint8_t  static _rst  = PIN_RST;
-    const uint8_t  static _mosi = 0;
+    // const uint8_t  static _mosi = 0;
     const uint8_t  static _sclk = 0;
     const int16_t  static _width  = WIDTH;
     const int16_t  static _height = HEIGHT;

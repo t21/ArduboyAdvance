@@ -617,10 +617,9 @@ void ArduboyAdvanceBase::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, ui
 // Done
 void ArduboyAdvanceBase::fillScreen(uint16_t color)
 {
-  for (uint16_t i = 0; i < (WIDTH * HEIGHT); i++)
-  {
-     sBuffer[i] = color;
-  }
+    for (uint32_t i = 0; i < (WIDTH * HEIGHT); i++) {
+        sBuffer[i] = color;
+    }
 }
 
 void ArduboyAdvanceBase::drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color)
@@ -956,14 +955,15 @@ void ArduboyAdvanceBase::drawCompressed(int16_t sx, int16_t sy, const uint8_t *b
 
 void ArduboyAdvanceBase::display()
 {
-  // Serial.println("ArduboyAdvanceBase::display()");
+  Serial.println("ArduboyAdvanceBase::display()");
   paintScreen(sBuffer);
 }
 
 void ArduboyAdvanceBase::display(bool clear)
 {
-  // Serial.println("ArduboyAdvanceBase::display(bool clear)");
-  paintScreen(sBuffer, clear);
+//   Serial.println("ArduboyAdvanceBase::display(bool clear)");
+//   Serial.println(__func__);
+    paintScreen(sBuffer, clear);
 }
 
 uint16_t* ArduboyAdvanceBase::getBuffer()

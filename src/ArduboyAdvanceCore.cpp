@@ -99,8 +99,8 @@ void ArduboyAdvanceCore::boot()
   // Select the ADC input here so a delay isn't required in initRandomSeed()
   // ADMUX = RAND_SEED_IN_ADMUX;
 
-  bootPins();
-  // bootSPI();
+    bootPins();
+    bootSPI();
   // bootOLED();
   bootTFT();
   // bootPowerSaving();
@@ -246,13 +246,18 @@ void ArduboyAdvanceCore::bootTFT()
   Serial.print("_cs:"); Serial.println(_cs);
   Serial.print("_dc:"); Serial.println(_dc);
   Serial.print("_rst:"); Serial.println(_rst);
-  Serial.print("_mosi:"); Serial.println(_mosi);
+//   Serial.print("_mosi:"); Serial.println(_mosi);
   Serial.print("_sclk:"); Serial.println(_sclk);
 
   pinMode(_rst, OUTPUT);
   digitalWrite(_rst, LOW);
-  pinMode(_dc, OUTPUT);
-  pinMode(_cs, OUTPUT);
+
+    // Control Pins
+    pinMode(_dc, OUTPUT);
+    digitalWrite(_dc, LOW);
+    pinMode(_cs, OUTPUT);
+    digitalWrite(_cs, HIGH);
+  
 // #ifdef __AVR__
 //   csport    = portOutputRegister(digitalPinToPort(_cs));
 //   dcport    = portOutputRegister(digitalPinToPort(_dc));
@@ -279,7 +284,7 @@ void ArduboyAdvanceCore::bootTFT()
 
   // if(hwSPI) { // Using hardware SPI
     // SPI.end();
-    SPI.begin();
+    // SPI.begin();
 // #ifdef __AVR__
 //     SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (full! speed!)
 // #endif
@@ -291,8 +296,9 @@ void ArduboyAdvanceCore::bootTFT()
 
     // spi_dma_init();
 
-    // SPI.beginTransaction(SPISetting(8000000, MSBFIRST, SPI_MODE0));
-    SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
+    // SPI.begin();
+    // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+    // SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
   // } else {
   //   pinMode(_sclk, OUTPUT);
   //   pinMode(_mosi, OUTPUT);
@@ -311,16 +317,17 @@ void ArduboyAdvanceCore::bootTFT()
   //   CLEAR_BIT(mosiport, mosipinmask);
   // }
 
-  // toggle RST low to reset
+    // toggle RST low to reset
+    digitalWrite(_rst, HIGH);
+    delay(5);
+    digitalWrite(_rst, LOW);
+    delay(20);
+    digitalWrite(_rst, HIGH);
+    delay(150);
 
-  digitalWrite(_rst, HIGH);
-  delay(5);
-  digitalWrite(_rst, LOW);
-  delay(20);
-  digitalWrite(_rst, HIGH);
-  delay(150);
-
-  /*
+    SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+    
+//  /*
   uint8_t x = readcommand8(ILI9340_RDMODE);
   Serial.print("\nDisplay Power Mode: 0x"); Serial.println(x, HEX);
   x = readcommand8(ILI9340_RDMADCTL);
@@ -331,7 +338,7 @@ void ArduboyAdvanceCore::bootTFT()
   Serial.print("\nImage Format: 0x"); Serial.println(x, HEX);
   x = readcommand8(ILI9340_RDSELFDIAG);
   Serial.print("\nSelf Diagnostic: 0x"); Serial.println(x, HEX);
-  */
+//  */
 
   //if(cmdList) commandList(cmdList);
 
@@ -441,6 +448,8 @@ void ArduboyAdvanceCore::bootTFT()
   writecommand(ILI9340_SLPOUT);    //Exit Sleep
   delay(120);
   writecommand(ILI9340_DISPON);    //Display on
+
+  SPI.endTransaction();
 }
 
 void ArduboyAdvanceCore::spiwrite(uint8_t c) {
@@ -496,7 +505,10 @@ void ArduboyAdvanceCore::LCDCommandMode()
 // Initialize the SPI interface for the display
 void ArduboyAdvanceCore::bootSPI()
 {
-// master, mode 0, MSB first, CPU clock / 2 (8MHz)
+    SPI.begin();
+    // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+
+  // master, mode 0, MSB first, CPU clock / 2 (8MHz)
   // SPCR = _BV(SPE) | _BV(MSTR);
   // SPSR = _BV(SPI2X);
 }
@@ -605,85 +617,75 @@ void ArduboyAdvanceCore::paint8Pixels(uint8_t pixels)
 // will be used by any buffer based subclass
 void ArduboyAdvanceCore::paintScreen(uint16_t image[], bool clear)
 {
-  writecommand(ILI9340_CASET); // Column addr set
-  writedata(0 >> 8);
-  writedata(0 & 0xFF);     // XSTART
-  writedata((WIDTH - 1) >> 8);
-  writedata((WIDTH - 1) & 0xFF);     // XEND
+//   writecommand(ILI9340_CASET); // Column addr set
+//   writedata(0 >> 8);
+//   writedata(0 & 0xFF);     // XSTART
+//   writedata((WIDTH - 1) >> 8);
+//   writedata((WIDTH - 1) & 0xFF);     // XEND
 
-  writecommand(ILI9340_PASET); // Row addr set
-  writedata(0>>8);
-  writedata(0);     // YSTART
-  writedata((HEIGHT - 1) >>8);
-  writedata(HEIGHT - 1);     // YEND
+//   writecommand(ILI9340_PASET); // Row addr set
+//   writedata(0>>8);
+//   writedata(0);     // YSTART
+//   writedata((HEIGHT - 1) >>8);
+//   writedata(HEIGHT - 1);     // YEND
 
   writecommand(ILI9340_RAMWR); // write to RAM
 
-  SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(15000000, MSBFIRST, SPI_MODE0));
 
   digitalWrite(_dc, HIGH);
   digitalWrite(_cs, LOW);
 
-    SPI.transfer(image, (HEIGHT * WIDTH));
+    // SPI.transfer((uint8_t *)image, (2 * HEIGHT * WIDTH));
 
-  // spi_dma_write((uint8_t *)image, (HEIGHT * WIDTH), 0);
-  // waitForDMA();
-
-    // DMA dma;
-    // dma.init();
-    // dma.spi_write(image, (HEIGHT * WIDTH));
-
-  // for (int i = 0; i < (HEIGHT*WIDTH); i++)
-  // {
-  //   // SPItransfer(pgm_read_byte(image[i]));
-  //   // SPItransfer(image[i]);
-  //   spiwrite(image[i]);
-  // }
+    for (uint32_t i = 0; i < (HEIGHT * WIDTH); i++) {
+        SPI.transfer16(image[i]);
+    }
 
   digitalWrite(_cs, HIGH);
   SPI.endTransaction();
 
     if (clear) {
-        for (int i = 0; i < (WIDTH * HEIGHT); i++) {
-            image = 0;
+        for (uint32_t i = 0; i < (WIDTH * HEIGHT); i++) {
+            image[i] = 0;
         }
     }
 
   return;
 
-  uint8_t c;
-  int i = 0;
+//   uint8_t c;
+//   int i = 0;
 
-  if (clear)
-  {
-    // SPDR = image[i]; // set the first SPI data byte to get things started
-    image[i++] = 0;  // clear the first image byte
-  }
-  else
-    // SPDR = image[i++];
+//   if (clear)
+//   {
+//     // SPDR = image[i]; // set the first SPI data byte to get things started
+//     image[i++] = 0;  // clear the first image byte
+//   }
+//   else
+//     // SPDR = image[i++];
 
-  // the code to iterate the loop and get the next byte from the buffer is
-  // executed while the previous byte is being sent out by the SPI controller
-  while (i < (HEIGHT * WIDTH) / 8)
-  {
-    // get the next byte. It's put in a local variable so it can be sent as
-    // as soon as possible after the sending of the previous byte has completed
-    if (clear)
-    {
-      c = image[i];
-      // clear the byte in the image buffer
-      image[i++] = 0;
-    }
-    else
-      c = image[i++];
+//   // the code to iterate the loop and get the next byte from the buffer is
+//   // executed while the previous byte is being sent out by the SPI controller
+//   while (i < (HEIGHT * WIDTH) / 8)
+//   {
+//     // get the next byte. It's put in a local variable so it can be sent as
+//     // as soon as possible after the sending of the previous byte has completed
+//     if (clear)
+//     {
+//       c = image[i];
+//       // clear the byte in the image buffer
+//       image[i++] = 0;
+//     }
+//     else
+//       c = image[i++];
 
-    // while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent
+//     // while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent
 
-    // put the next byte in the SPI data register. The SPI controller will
-    // clock it out while the loop continues and gets the next byte ready
-    // SPDR = c;
-  }
-  // while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
+//     // put the next byte in the SPI data register. The SPI controller will
+//     // clock it out while the loop continues and gets the next byte ready
+//     // SPDR = c;
+//   }
+//   // while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
 }
 
 // bool ArduboyAdvanceCore::waitForDMA()
