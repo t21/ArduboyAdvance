@@ -155,11 +155,13 @@ void ArduboyAdvanceCore::bootPins()
 
 #if defined(ARDUBOY_20) || defined(ARDUBOY_36)
 
+analogReadResolution(A_READ_BITS); //For joystick
+
 pinMode(PIN_A_BUTTON, INPUT_PULLUP);
 pinMode(PIN_B_BUTTON, INPUT_PULLUP);
 pinMode(PIN_X_BUTTON, INPUT_PULLUP);
 pinMode(PIN_Y_BUTTON, INPUT_PULLUP);
-pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP); //Maybe pullup
+pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP); 
 pinMode(PIN_JOY_X_AXIS, INPUT);
 pinMode(PIN_JOY_Y_AXIS, INPUT);
 

@@ -958,6 +958,13 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    */
   bool justReleased(uint8_t button);
 
+  //Joystick
+  int joyX();
+  int joyY();
+
+  long scaledJoyX();
+  long scaledJoyY(); 
+
   /** \brief
    * Test if a point falls within a rectangle.
    *

@@ -109,9 +109,16 @@
 #define PIN_JOY_SEL_BUTTON 30
 
 //Joystick
-#define PIN_JOY_X_AXIS A12 //Inverted because to joystick is
-#define PIN_JOY_Y_AXIS A13
-
+#define PIN_JOY_X_AXIS A5
+#define PIN_JOY_Y_AXIS A6
+#define JOY_X_THRESHOLD_LOW 2000
+#define JOY_Y_THRESHOLD_LOW 2020
+#define JOY_X_THRESHOLD_HIGH 2080
+#define JOY_Y_THRESHOLD_HIGH 2060
+#define JOY_X_THRESHOLD_SCALED_LOW -3
+#define JOY_Y_THRESHOLD_SCALED_LOW -2
+#define JOY_X_THRESHOLD_SCALED_HIGH 0
+#define JOY_Y_THRESHOLD_SCALED_HIGH 0 //Maybe 1
 
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
