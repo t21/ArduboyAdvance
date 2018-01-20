@@ -7,7 +7,7 @@
 #include "ArduboyAdvanceCore.h"
 #include "pins_arduino.h"
 // #include "spi_dma.h"
-#include <SPI.h>
+// #include <SPI.h>
 
 // #define USE_SPI_LIBRARY
 // #define SET_BIT(port, bitMask) digitalWrite(*(port), HIGH);
@@ -81,12 +81,6 @@
 
 ArduboyAdvanceCore::ArduboyAdvanceCore()
 {
-  // _cs   = A1;
-  // _dc   = 7;
-  // _rst  = 6;
-  // _mosi  = _sclk = 0;
-  // _width  = ILI9340_TFTWIDTH;
-  // _height = ILI9340_TFTHEIGHT;
 }
 
 void ArduboyAdvanceCore::boot()
@@ -99,10 +93,12 @@ void ArduboyAdvanceCore::boot()
   // Select the ADC input here so a delay isn't required in initRandomSeed()
   // ADMUX = RAND_SEED_IN_ADMUX;
 
-    bootPins();
-    bootSPI();
-  // bootOLED();
-  bootTFT();
+    // bootPins();
+    gpio_init();
+    // bootSPI();
+    // bootOLED();
+    ili9341_init();
+    // bootTFT();
   // bootPowerSaving();
 }
 
@@ -122,6 +118,35 @@ void ArduboyAdvanceCore::boot()
 //   SREG = oldSREG;       // restore interrupts
 // }
 // #endif
+
+
+void ArduboyAdvanceCore::gpio_init()
+{
+    // Set up pins for the display
+    pinMode(PIN_DISP_RD, OUTPUT);
+    pinMode(PIN_DISP_WR, OUTPUT);
+    pinMode(PIN_DISP_CD, OUTPUT);
+    pinMode(PIN_DISP_CS, OUTPUT);
+
+    CS_IDLE; // Set all control bits to HIGH (idle)
+
+    CD_DATA; // Signals are ACTIVE LOW
+
+    WR_IDLE;
+
+    RD_IDLE;
+
+    pinMode(PIN_DISP_RST, OUTPUT);
+    digitalWriteFast(PIN_DISP_RST, HIGH);
+
+    //set up 8 bit parallel port to write mode.
+    setWriteDataBus();
+
+    // ToDo: Add the rest of the pins
+
+}
+
+
 
 // Pins are set to the proper modes and levels for the specific hardware.
 // This routine must be modified if any pins are moved to a different port
@@ -219,6 +244,184 @@ pinMode(PIN_JOY_Y_AXIS, INPUT);
 #endif
 }
 
+
+void ArduboyAdvanceCore::ili9341_init(void)
+{
+    // toggle RST low to reset
+    digitalWrite(PIN_DISP_RST, HIGH);
+    delay(5);
+    digitalWrite(PIN_DISP_RST, LOW);
+    delay(20);
+    digitalWrite(PIN_DISP_RST, HIGH);
+    delay(150);
+
+    writecommand(0xEF);
+    writedata(0x03);
+    writedata(0x80);
+    writedata(0x02);
+
+    writecommand(0xCF);
+    writedata(0x00);
+    writedata(0XC1);
+    writedata(0X30);
+
+    writecommand(0xED);
+    writedata(0x64);
+    writedata(0x03);
+    writedata(0X12);
+    writedata(0X81);
+
+    writecommand(0xE8);
+    writedata(0x85);
+    writedata(0x00);
+    writedata(0x78);
+
+    writecommand(0xCB);
+    writedata(0x39);
+    writedata(0x2C);
+    writedata(0x00);
+    writedata(0x34);
+    writedata(0x02);
+
+    writecommand(0xF7);
+    writedata(0x20);
+
+    writecommand(0xEA);
+    writedata(0x00);
+    writedata(0x00);
+
+    writecommand(ILI9341_PWCTR1);    //Power control
+    writedata(0x23);   //VRH[5:0]
+
+    writecommand(ILI9341_PWCTR2);    //Power control
+    writedata(0x10);   //SAP[2:0];BT[3:0]
+
+    writecommand(ILI9341_VMCTR1);    //VCM control
+    writedata(0x3e); //
+    writedata(0x28);
+
+    writecommand(ILI9341_VMCTR2);    //VCM control2
+    writedata(0x86);  //--
+
+    writecommand(ILI9341_MADCTL);    // Memory Access Control
+    writedata(0x48);
+
+    writecommand(ILI9341_PIXFMT);
+    writedata(0x55);
+
+    writecommand(ILI9341_FRMCTR1);
+    writedata(0x00);
+    writedata(0x18);
+
+    writecommand(ILI9341_DFUNCTR);    // Display Function Control
+    writedata(0x08);
+    writedata(0x82);
+    writedata(0x27);
+
+    writecommand(0xF2);    // 3Gamma Function Disable
+    writedata(0x00);
+
+    writecommand(ILI9341_GAMMASET);    //Gamma curve selected
+    writedata(0x01);
+
+    writecommand(ILI9341_GMCTRP1);    //Set Gamma
+    writedata(0x0F);
+    writedata(0x31);
+    writedata(0x2B);
+    writedata(0x0C);
+    writedata(0x0E);
+    writedata(0x08);
+    writedata(0x4E);
+    writedata(0xF1);
+    writedata(0x37);
+    writedata(0x07);
+    writedata(0x10);
+    writedata(0x03);
+    writedata(0x0E);
+    writedata(0x09);
+    writedata(0x00);
+
+    writecommand(ILI9341_GMCTRN1);    //Set Gamma
+    writedata(0x00);
+    writedata(0x0E);
+    writedata(0x14);
+    writedata(0x03);
+    writedata(0x11);
+    writedata(0x07);
+    writedata(0x31);
+    writedata(0xC1);
+    writedata(0x48);
+    writedata(0x08);
+    writedata(0x0F);
+    writedata(0x0C);
+    writedata(0x31);
+    writedata(0x36);
+    writedata(0x0F);
+
+    // Rotate screen 90deg
+    writecommand(ILI9341_MADCTL);
+    writedata(ILI9341_MADCTL_MX | ILI9341_MADCTL_MY |
+            ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR);
+
+    writecommand(ILI9341_INVOFF); //Invert Off
+    delay(120);
+    writecommand(ILI9341_SLPOUT);    //Exit Sleep
+    delay(120);
+    writecommand(ILI9341_DISPON);    //Display on
+}
+
+
+void ArduboyAdvanceCore::setRotation(uint8_t x) {
+
+  // Call parent rotation func first -- sets up rotation flags, etc.
+//   Adafruit_GFX::setRotation(x);
+
+    uint8_t rotation = (x & 3);
+
+    switch(rotation) {
+        case 0:
+        case 2:
+            // _width  = SCREEN_WIDTH;
+            // _height = SCREEN_HEIGHT;
+            break;
+        case 1:
+        case 3:
+            // _width  = SCREEN_HEIGHT;
+            // _height = SCREEN_WIDTH;
+            break;
+        default:
+            break;
+    }
+
+  // Then perform hardware-specific rotation operations...
+
+    CS_ACTIVE;
+
+    uint16_t t = 0;
+
+    switch (rotation) {
+        case 2:
+            t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
+            break;
+        case 3:
+            t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+            break;
+        case 0:
+            t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
+            break;
+        case 1:
+            t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+            break;
+        default:
+            break;
+    }
+
+    writecommand(ILI9341_MADCTL);
+    writedata(t);
+    // For 9341, init default full-screen address window:
+    // setAddrWindow(0, 0, _width - 1, _height - 1); // CS_IDLE happens here
+}
+
 // void ArduboyAdvanceCore::bootOLED()
 // {
 //   // reset the display
@@ -238,289 +441,316 @@ pinMode(PIN_JOY_Y_AXIS, INPUT);
 //   LCDDataMode();
 // }
 
-void ArduboyAdvanceCore::bootTFT()
-{
+// void ArduboyAdvanceCore::bootTFT()
+// {
 
-  Serial.print("W:"); Serial.print(WIDTH); Serial.print(":"); Serial.println(_width);
-  Serial.print("H:"); Serial.print(HEIGHT); Serial.print(":"); Serial.println(_height);
-  Serial.print("_cs:"); Serial.println(_cs);
-  Serial.print("_dc:"); Serial.println(_dc);
-  Serial.print("_rst:"); Serial.println(_rst);
-//   Serial.print("_mosi:"); Serial.println(_mosi);
-  Serial.print("_sclk:"); Serial.println(_sclk);
+//   Serial.print("W:"); Serial.print(WIDTH); Serial.print(":"); Serial.println(_width);
+//   Serial.print("H:"); Serial.print(HEIGHT); Serial.print(":"); Serial.println(_height);
+//   Serial.print("_cs:"); Serial.println(_cs);
+//   Serial.print("_dc:"); Serial.println(_dc);
+//   Serial.print("_rst:"); Serial.println(_rst);
+// //   Serial.print("_mosi:"); Serial.println(_mosi);
+//   Serial.print("_sclk:"); Serial.println(_sclk);
 
-  pinMode(_rst, OUTPUT);
-  digitalWrite(_rst, LOW);
+//   pinMode(_rst, OUTPUT);
+//   digitalWrite(_rst, LOW);
 
-    // Control Pins
-    pinMode(_dc, OUTPUT);
-    digitalWrite(_dc, LOW);
-    pinMode(_cs, OUTPUT);
-    digitalWrite(_cs, HIGH);
-  
-// #ifdef __AVR__
-//   csport    = portOutputRegister(digitalPinToPort(_cs));
-//   dcport    = portOutputRegister(digitalPinToPort(_dc));
-// #endif
-// #if defined(__SAM3X8E__)
-//   csport    = digitalPinToPort(_cs);
-//   dcport    = digitalPinToPort(_dc);
-// #endif
-// #if defined(__arm__) && defined(CORE_TEENSY)
-//   mosiport = &_mosi;
-//   clkport = &_sclk;
-//   rsport = &_rst;
-//   csport    = &_cs;
-//   dcport    = &_dc;
-// #endif
+//     // Control Pins
+//     pinMode(_dc, OUTPUT);
+//     digitalWrite(_dc, LOW);
+//     pinMode(_cs, OUTPUT);
+//     digitalWrite(_cs, HIGH);
 
-// mosiport = &_mosi;
-// clkport = &_sclk;
-// rsport = &_rst;
-// csport    = &_cs;
-// dcport    = &_dc;
-//   cspinmask = digitalPinToBitMask(_cs);
-//   dcpinmask = digitalPinToBitMask(_dc);
+// // #ifdef __AVR__
+// //   csport    = portOutputRegister(digitalPinToPort(_cs));
+// //   dcport    = portOutputRegister(digitalPinToPort(_dc));
+// // #endif
+// // #if defined(__SAM3X8E__)
+// //   csport    = digitalPinToPort(_cs);
+// //   dcport    = digitalPinToPort(_dc);
+// // #endif
+// // #if defined(__arm__) && defined(CORE_TEENSY)
+// //   mosiport = &_mosi;
+// //   clkport = &_sclk;
+// //   rsport = &_rst;
+// //   csport    = &_cs;
+// //   dcport    = &_dc;
+// // #endif
 
-  // if(hwSPI) { // Using hardware SPI
-    // SPI.end();
-    // SPI.begin();
-// #ifdef __AVR__
-//     SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (full! speed!)
-// #endif
-// #if defined(__SAM3X8E__)
-//     SPI.setClockDivider(11); // 85MHz / 11 = 7.6 MHz (full! speed!)
-// #endif    //SPI.setBitOrder(MSBFIRST);
-    // SPI.setBitOrder(MSBFIRST);
-    // SPI.setDataMode(SPI_MODE0);
+// // mosiport = &_mosi;
+// // clkport = &_sclk;
+// // rsport = &_rst;
+// // csport    = &_cs;
+// // dcport    = &_dc;
+// //   cspinmask = digitalPinToBitMask(_cs);
+// //   dcpinmask = digitalPinToBitMask(_dc);
 
-    // spi_dma_init();
+//   // if(hwSPI) { // Using hardware SPI
+//     // SPI.end();
+//     // SPI.begin();
+// // #ifdef __AVR__
+// //     SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (full! speed!)
+// // #endif
+// // #if defined(__SAM3X8E__)
+// //     SPI.setClockDivider(11); // 85MHz / 11 = 7.6 MHz (full! speed!)
+// // #endif    //SPI.setBitOrder(MSBFIRST);
+//     // SPI.setBitOrder(MSBFIRST);
+//     // SPI.setDataMode(SPI_MODE0);
 
-    // SPI.begin();
-    // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-    // SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
-  // } else {
-  //   pinMode(_sclk, OUTPUT);
-  //   pinMode(_mosi, OUTPUT);
-  //   pinMode(_miso, INPUT);
-// #ifdef __AVR__
-//     clkport     = portOutputRegister(digitalPinToPort(_sclk));
-//     mosiport    = portOutputRegister(digitalPinToPort(_mosi));
-// #endif
-// #if defined(__SAM3X8E__)
-//     clkport     = digitalPinToPort(_sclk);
-//     mosiport    = digitalPinToPort(_mosi);
-// #endif
-  //   clkpinmask  = digitalPinToBitMask(_sclk);
-  //   mosipinmask = digitalPinToBitMask(_mosi);
-  //   CLEAR_BIT(clkport, clkpinmask);
-  //   CLEAR_BIT(mosiport, mosipinmask);
-  // }
+//     // spi_dma_init();
 
-    // toggle RST low to reset
-    digitalWrite(_rst, HIGH);
-    delay(5);
-    digitalWrite(_rst, LOW);
-    delay(20);
-    digitalWrite(_rst, HIGH);
-    delay(150);
+//     // SPI.begin();
+//     // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+//     // SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
+//   // } else {
+//   //   pinMode(_sclk, OUTPUT);
+//   //   pinMode(_mosi, OUTPUT);
+//   //   pinMode(_miso, INPUT);
+// // #ifdef __AVR__
+// //     clkport     = portOutputRegister(digitalPinToPort(_sclk));
+// //     mosiport    = portOutputRegister(digitalPinToPort(_mosi));
+// // #endif
+// // #if defined(__SAM3X8E__)
+// //     clkport     = digitalPinToPort(_sclk);
+// //     mosiport    = digitalPinToPort(_mosi);
+// // #endif
+//   //   clkpinmask  = digitalPinToBitMask(_sclk);
+//   //   mosipinmask = digitalPinToBitMask(_mosi);
+//   //   CLEAR_BIT(clkport, clkpinmask);
+//   //   CLEAR_BIT(mosiport, mosipinmask);
+//   // }
 
-    SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-    
-//  /*
-  uint8_t x = readcommand8(ILI9340_RDMODE);
-  Serial.print("\nDisplay Power Mode: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9340_RDMADCTL);
-  Serial.print("\nMADCTL Mode: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9340_RDPIXFMT);
-  Serial.print("\nPixel Format: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9340_RDIMGFMT);
-  Serial.print("\nImage Format: 0x"); Serial.println(x, HEX);
-  x = readcommand8(ILI9340_RDSELFDIAG);
-  Serial.print("\nSelf Diagnostic: 0x"); Serial.println(x, HEX);
-//  */
+//     // toggle RST low to reset
+//     digitalWrite(_rst, HIGH);
+//     delay(5);
+//     digitalWrite(_rst, LOW);
+//     delay(20);
+//     digitalWrite(_rst, HIGH);
+//     delay(150);
 
-  //if(cmdList) commandList(cmdList);
+//     SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
 
-  writecommand(0xEF);
-  writedata(0x03);
-  writedata(0x80);
-  writedata(0x02);
+// //  /*
+//   uint8_t x = readcommand8(ILI9340_RDMODE);
+//   Serial.print("\nDisplay Power Mode: 0x"); Serial.println(x, HEX);
+//   x = readcommand8(ILI9340_RDMADCTL);
+//   Serial.print("\nMADCTL Mode: 0x"); Serial.println(x, HEX);
+//   x = readcommand8(ILI9340_RDPIXFMT);
+//   Serial.print("\nPixel Format: 0x"); Serial.println(x, HEX);
+//   x = readcommand8(ILI9340_RDIMGFMT);
+//   Serial.print("\nImage Format: 0x"); Serial.println(x, HEX);
+//   x = readcommand8(ILI9340_RDSELFDIAG);
+//   Serial.print("\nSelf Diagnostic: 0x"); Serial.println(x, HEX);
+// //  */
 
-  writecommand(0xCF);
-  writedata(0x00);
-  writedata(0XC1);
-  writedata(0X30);
+//   //if(cmdList) commandList(cmdList);
 
-  writecommand(0xED);
-  writedata(0x64);
-  writedata(0x03);
-  writedata(0X12);
-  writedata(0X81);
+//   writecommand(0xEF);
+//   writedata(0x03);
+//   writedata(0x80);
+//   writedata(0x02);
 
-  writecommand(0xE8);
-  writedata(0x85);
-  writedata(0x00);
-  writedata(0x78);
+//   writecommand(0xCF);
+//   writedata(0x00);
+//   writedata(0XC1);
+//   writedata(0X30);
 
-  writecommand(0xCB);
-  writedata(0x39);
-  writedata(0x2C);
-  writedata(0x00);
-  writedata(0x34);
-  writedata(0x02);
+//   writecommand(0xED);
+//   writedata(0x64);
+//   writedata(0x03);
+//   writedata(0X12);
+//   writedata(0X81);
 
-  writecommand(0xF7);
-  writedata(0x20);
+//   writecommand(0xE8);
+//   writedata(0x85);
+//   writedata(0x00);
+//   writedata(0x78);
 
-  writecommand(0xEA);
-  writedata(0x00);
-  writedata(0x00);
+//   writecommand(0xCB);
+//   writedata(0x39);
+//   writedata(0x2C);
+//   writedata(0x00);
+//   writedata(0x34);
+//   writedata(0x02);
 
-  writecommand(ILI9340_PWCTR1);    //Power control
-  writedata(0x23);   //VRH[5:0]
+//   writecommand(0xF7);
+//   writedata(0x20);
 
-  writecommand(ILI9340_PWCTR2);    //Power control
-  writedata(0x10);   //SAP[2:0];BT[3:0]
+//   writecommand(0xEA);
+//   writedata(0x00);
+//   writedata(0x00);
 
-  writecommand(ILI9340_VMCTR1);    //VCM control
-  writedata(0x3e); //�Աȶȵ���
-  writedata(0x28);
+//   writecommand(ILI9340_PWCTR1);    //Power control
+//   writedata(0x23);   //VRH[5:0]
 
-  writecommand(ILI9340_VMCTR2);    //VCM control2
-  writedata(0x86);  //--
+//   writecommand(ILI9340_PWCTR2);    //Power control
+//   writedata(0x10);   //SAP[2:0];BT[3:0]
 
-  writecommand(ILI9340_MADCTL);    // Memory Access Control
-  writedata(ILI9340_MADCTL_MX | ILI9340_MADCTL_BGR);
+//   writecommand(ILI9340_VMCTR1);    //VCM control
+//   writedata(0x3e); //�Աȶȵ���
+//   writedata(0x28);
 
-  writecommand(ILI9340_PIXFMT);
-  writedata(0x55);
+//   writecommand(ILI9340_VMCTR2);    //VCM control2
+//   writedata(0x86);  //--
 
-  writecommand(ILI9340_FRMCTR1);
-  writedata(0x00);
-  writedata(0x18);
+//   writecommand(ILI9340_MADCTL);    // Memory Access Control
+//   writedata(ILI9340_MADCTL_MX | ILI9340_MADCTL_BGR);
 
-  writecommand(ILI9340_DFUNCTR);    // Display Function Control
-  writedata(0x08);
-  writedata(0x82);
-  writedata(0x27);
+//   writecommand(ILI9340_PIXFMT);
+//   writedata(0x55);
 
-  writecommand(0xF2);    // 3Gamma Function Disable
-  writedata(0x00);
+//   writecommand(ILI9340_FRMCTR1);
+//   writedata(0x00);
+//   writedata(0x18);
 
-  writecommand(ILI9340_GAMMASET);    //Gamma curve selected
-  writedata(0x01);
+//   writecommand(ILI9340_DFUNCTR);    // Display Function Control
+//   writedata(0x08);
+//   writedata(0x82);
+//   writedata(0x27);
 
-  writecommand(ILI9340_GMCTRP1);    //Set Gamma
-  writedata(0x0F);
-  writedata(0x31);
-  writedata(0x2B);
-  writedata(0x0C);
-  writedata(0x0E);
-  writedata(0x08);
-  writedata(0x4E);
-  writedata(0xF1);
-  writedata(0x37);
-  writedata(0x07);
-  writedata(0x10);
-  writedata(0x03);
-  writedata(0x0E);
-  writedata(0x09);
-  writedata(0x00);
+//   writecommand(0xF2);    // 3Gamma Function Disable
+//   writedata(0x00);
 
-  writecommand(ILI9340_GMCTRN1);    //Set Gamma
-  writedata(0x00);
-  writedata(0x0E);
-  writedata(0x14);
-  writedata(0x03);
-  writedata(0x11);
-  writedata(0x07);
-  writedata(0x31);
-  writedata(0xC1);
-  writedata(0x48);
-  writedata(0x08);
-  writedata(0x0F);
-  writedata(0x0C);
-  writedata(0x31);
-  writedata(0x36);
-  writedata(0x0F);
+//   writecommand(ILI9340_GAMMASET);    //Gamma curve selected
+//   writedata(0x01);
 
-  writecommand(ILI9340_SLPOUT);    //Exit Sleep
-  delay(120);
-  writecommand(ILI9340_DISPON);    //Display on
+//   writecommand(ILI9340_GMCTRP1);    //Set Gamma
+//   writedata(0x0F);
+//   writedata(0x31);
+//   writedata(0x2B);
+//   writedata(0x0C);
+//   writedata(0x0E);
+//   writedata(0x08);
+//   writedata(0x4E);
+//   writedata(0xF1);
+//   writedata(0x37);
+//   writedata(0x07);
+//   writedata(0x10);
+//   writedata(0x03);
+//   writedata(0x0E);
+//   writedata(0x09);
+//   writedata(0x00);
 
-  SPI.endTransaction();
+//   writecommand(ILI9340_GMCTRN1);    //Set Gamma
+//   writedata(0x00);
+//   writedata(0x0E);
+//   writedata(0x14);
+//   writedata(0x03);
+//   writedata(0x11);
+//   writedata(0x07);
+//   writedata(0x31);
+//   writedata(0xC1);
+//   writedata(0x48);
+//   writedata(0x08);
+//   writedata(0x0F);
+//   writedata(0x0C);
+//   writedata(0x31);
+//   writedata(0x36);
+//   writedata(0x0F);
+
+//   writecommand(ILI9340_SLPOUT);    //Exit Sleep
+//   delay(120);
+//   writecommand(ILI9340_DISPON);    //Display on
+
+//   SPI.endTransaction();
+// }
+
+// void ArduboyAdvanceCore::spiwrite(uint8_t c) {
+//   // Serial.print("0x"); Serial.print(c, HEX); Serial.print(", ");
+//   SPI.transfer(c);
+// }
+
+// void ArduboyAdvanceCore::writecommand(uint8_t c) {
+//   // CLEAR_BIT(dcport, dcpinmask);
+//   digitalWrite(_dc, LOW);
+//   // CLEAR_BIT(clkport, clkpinmask);
+//   digitalWrite(_sclk, LOW);
+//   // CLEAR_BIT(csport, cspinmask);
+//   digitalWrite(_cs, LOW);
+
+//   spiwrite(c);
+
+//   // SET_BIT(csport, cspinmask);
+//   digitalWrite(_cs, HIGH);
+// }
+
+
+// void ArduboyAdvanceCore::writedata(uint8_t c) {
+//   // SET_BIT(dcport,  dcpinmask);
+//   digitalWrite(_dc, HIGH);
+//   // CLEAR_BIT(clkport, clkpinmask);
+//   digitalWrite(_sclk, LOW);
+//   // CLEAR_BIT(csport, cspinmask);
+//   digitalWrite(_cs, LOW);
+
+//   spiwrite(c);
+
+//   digitalWrite(_cs, HIGH);
+//   // SET_BIT(csport, cspinmask);
+// }
+
+
+void ArduboyAdvanceCore::setWriteDataBus(void) {
+    // set the data pins to output mode
+    pinMode(PIN_DISP_D0, OUTPUT);
+    pinMode(PIN_DISP_D1, OUTPUT);
+    pinMode(PIN_DISP_D2, OUTPUT);
+    pinMode(PIN_DISP_D3, OUTPUT);
+    pinMode(PIN_DISP_D4, OUTPUT);
+    pinMode(PIN_DISP_D5, OUTPUT);
+    pinMode(PIN_DISP_D6, OUTPUT);
+    pinMode(PIN_DISP_D7, OUTPUT);
 }
 
-void ArduboyAdvanceCore::spiwrite(uint8_t c) {
-  // Serial.print("0x"); Serial.print(c, HEX); Serial.print(", ");
-  SPI.transfer(c);
-}
 
-void ArduboyAdvanceCore::writecommand(uint8_t c) {
-  // CLEAR_BIT(dcport, dcpinmask);
-  digitalWrite(_dc, LOW);
-  // CLEAR_BIT(clkport, clkpinmask);
-  digitalWrite(_sclk, LOW);
-  // CLEAR_BIT(csport, cspinmask);
-  digitalWrite(_cs, LOW);
-
-  spiwrite(c);
-
-  // SET_BIT(csport, cspinmask);
-  digitalWrite(_cs, HIGH);
+void ArduboyAdvanceCore::setReadDataBus(void) {
+    //set the data pins to input mode
+    pinMode(PIN_DISP_D0, INPUT);
+    pinMode(PIN_DISP_D1, INPUT);
+    pinMode(PIN_DISP_D2, INPUT);
+    pinMode(PIN_DISP_D3, INPUT);
+    pinMode(PIN_DISP_D4, INPUT);
+    pinMode(PIN_DISP_D5, INPUT);
+    pinMode(PIN_DISP_D6, INPUT);
+    pinMode(PIN_DISP_D7, INPUT);
 }
 
 
-void ArduboyAdvanceCore::writedata(uint8_t c) {
-  // SET_BIT(dcport,  dcpinmask);
-  digitalWrite(_dc, HIGH);
-  // CLEAR_BIT(clkport, clkpinmask);
-  digitalWrite(_sclk, LOW);
-  // CLEAR_BIT(csport, cspinmask);
-  digitalWrite(_cs, LOW);
+// void ArduboyAdvanceCore::LCDDataMode()
+// {
+//     // bitSet(DC_PORT, DC_BIT);
+//     digitalWrite(_dc, HIGH);
+//     digitalWrite(_sclk, LOW);
+//     digitalWrite(_cs, LOW);
+// }
 
-  spiwrite(c);
+// void ArduboyAdvanceCore::LCDCommandMode()
+// {
+//     // bitClear(DC_PORT, DC_BIT);
+//     digitalWrite(_dc, LOW);
+//     digitalWrite(_sclk, LOW);
+//     digitalWrite(_cs, LOW);
+// }
 
-  digitalWrite(_cs, HIGH);
-  // SET_BIT(csport, cspinmask);
-}
+// // Initialize the SPI interface for the display
+// void ArduboyAdvanceCore::bootSPI()
+// {
+//     SPI.begin();
+//     // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
 
-void ArduboyAdvanceCore::LCDDataMode()
-{
-    // bitSet(DC_PORT, DC_BIT);
-    digitalWrite(_dc, HIGH);
-    digitalWrite(_sclk, LOW);
-    digitalWrite(_cs, LOW);
-}
+//   // master, mode 0, MSB first, CPU clock / 2 (8MHz)
+//   // SPCR = _BV(SPE) | _BV(MSTR);
+//   // SPSR = _BV(SPI2X);
+// }
 
-void ArduboyAdvanceCore::LCDCommandMode()
-{
-    // bitClear(DC_PORT, DC_BIT);
-    digitalWrite(_dc, LOW);
-    digitalWrite(_sclk, LOW);
-    digitalWrite(_cs, LOW);
-}
-
-// Initialize the SPI interface for the display
-void ArduboyAdvanceCore::bootSPI()
-{
-    SPI.begin();
-    // SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-
-  // master, mode 0, MSB first, CPU clock / 2 (8MHz)
-  // SPCR = _BV(SPE) | _BV(MSTR);
-  // SPSR = _BV(SPI2X);
-}
-
-// Write to the SPI bus (MOSI pin)
-void ArduboyAdvanceCore::SPItransfer(uint8_t data)
-{
-    SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
-    spiwrite(data);
-    digitalWrite(_cs, HIGH);
-    SPI.endTransaction();
-}
+// // Write to the SPI bus (MOSI pin)
+// void ArduboyAdvanceCore::SPItransfer(uint8_t data)
+// {
+//     SPI.beginTransaction(SPISettings(12000000, MSBFIRST, SPI_MODE0));
+//     spiwrite(data);
+//     digitalWrite(_cs, HIGH);
+//     SPI.endTransaction();
+// }
 
 void ArduboyAdvanceCore::safeMode()
 {
@@ -573,31 +803,71 @@ void ArduboyAdvanceCore::displayOn()
   // bootOLED();
 }
 
-uint16_t ArduboyAdvanceCore::width() { return WIDTH; }
+uint16_t ArduboyAdvanceCore::getWidth() {
+    return SCREEN_WIDTH;
+}
 
-uint16_t ArduboyAdvanceCore::height() { return HEIGHT; }
+uint16_t ArduboyAdvanceCore::getHeight() {
+    return SCREEN_HEIGHT;
+}
 
 
 /* Drawing */
 
-// ToDo: Remove again? Comes from ILI9340 driver
+// // ToDo: Remove again? Comes from ILI9340 driver
+// void ArduboyAdvanceCore::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+// {
+
+//      writecommand(ILI9340_CASET); // Column addr set
+//      writedata(x0 >> 8);
+//      writedata(x0 & 0xFF);     // XSTART
+//      writedata(x1 >> 8);
+//      writedata(x1 & 0xFF);     // XEND
+
+//      writecommand(ILI9340_PASET); // Row addr set
+//      writedata(y0>>8);
+//      writedata(y0);     // YSTART
+//      writedata(y1>>8);
+//      writedata(y1);     // YEND
+
+//      writecommand(ILI9340_RAMWR); // write to RAM
+// }
+
 void ArduboyAdvanceCore::setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
+    CS_ACTIVE;
 
-     writecommand(ILI9340_CASET); // Column addr set
-     writedata(x0 >> 8);
-     writedata(x0 & 0xFF);     // XSTART
-     writedata(x1 >> 8);
-     writedata(x1 & 0xFF);     // XEND
+    CD_COMMAND;
+    // write8special(ILI9341_CASET); // Column addr set
+    write8(ILI9341_CASET); // Column addr set
+    CD_DATA;
+    // write8special(x0 >> 8);
+    // write8special(x0 & 0xFF);     // XSTART
+    // write8special(x1 >> 8);
+    // write8special(x1 & 0xFF);     // XEND
+    write8(x0 >> 8);
+    write8(x0 & 0xFF);     // XSTART
+    write8(x1 >> 8);
+    write8(x1 & 0xFF);     // XEND
 
-     writecommand(ILI9340_PASET); // Row addr set
-     writedata(y0>>8);
-     writedata(y0);     // YSTART
-     writedata(y1>>8);
-     writedata(y1);     // YEND
+    CD_COMMAND;
+    // write8special(ILI9341_PASET); // Row addr set
+    write8(ILI9341_PASET); // Row addr set
+    CD_DATA;
+    // write8special(y0 >> 8);
+    // write8special(y0);     // YSTART
+    // write8special(y1 >> 8);
+    // write8special(y1);     // YEND
+    write8(y0 >> 8);
+    write8(y0);     // YSTART
+    write8(y1 >> 8);
+    write8(y1);     // YEND
 
-     writecommand(ILI9340_RAMWR); // write to RAM
+    CD_COMMAND;
+    // write8special(ILI9341_RAMWR); // write to RAM
+    write8(ILI9341_RAMWR); // write to RAM
 }
+
 
 void ArduboyAdvanceCore::paint8Pixels(uint8_t pixels)
 {
@@ -615,77 +885,94 @@ void ArduboyAdvanceCore::paint8Pixels(uint8_t pixels)
 
 // paint from a memory buffer, this should be FAST as it's likely what
 // will be used by any buffer based subclass
-void ArduboyAdvanceCore::paintScreen(uint16_t image[], bool clear)
+void ArduboyAdvanceCore::paintScreen(uint8_t image[], bool clear)
 {
-//   writecommand(ILI9340_CASET); // Column addr set
-//   writedata(0 >> 8);
-//   writedata(0 & 0xFF);     // XSTART
-//   writedata((WIDTH - 1) >> 8);
-//   writedata((WIDTH - 1) & 0xFF);     // XEND
+    setAddrWindow(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
-//   writecommand(ILI9340_PASET); // Row addr set
-//   writedata(0>>8);
-//   writedata(0);     // YSTART
-//   writedata((HEIGHT - 1) >>8);
-//   writedata(HEIGHT - 1);     // YEND
+    CD_DATA;
 
-  writecommand(ILI9340_RAMWR); // write to RAM
-
-  SPI.beginTransaction(SPISettings(15000000, MSBFIRST, SPI_MODE0));
-
-  digitalWrite(_dc, HIGH);
-  digitalWrite(_cs, LOW);
-
-    // SPI.transfer((uint8_t *)image, (2 * HEIGHT * WIDTH));
-
-    for (uint32_t i = 0; i < (HEIGHT * WIDTH); i++) {
-        SPI.transfer16(image[i]);
-    }
-
-  digitalWrite(_cs, HIGH);
-  SPI.endTransaction();
-
-    if (clear) {
-        for (uint32_t i = 0; i < (WIDTH * HEIGHT); i++) {
-            image[i] = 0;
+    for (uint32_t i = 0; i < SCREEN_BUF_SIZE; i += 2) {
+        write8(image[i]);
+        write8(image[i + 1]);
+        if (clear) {
+            image[i] = 0x00;
+            image[i + 1] = 0x00;
         }
     }
 
-  return;
+    CS_IDLE;
 
-//   uint8_t c;
-//   int i = 0;
+    return;
 
-//   if (clear)
-//   {
-//     // SPDR = image[i]; // set the first SPI data byte to get things started
-//     image[i++] = 0;  // clear the first image byte
-//   }
-//   else
-//     // SPDR = image[i++];
+// //   writecommand(ILI9340_CASET); // Column addr set
+// //   writedata(0 >> 8);
+// //   writedata(0 & 0xFF);     // XSTART
+// //   writedata((WIDTH - 1) >> 8);
+// //   writedata((WIDTH - 1) & 0xFF);     // XEND
 
-//   // the code to iterate the loop and get the next byte from the buffer is
-//   // executed while the previous byte is being sent out by the SPI controller
-//   while (i < (HEIGHT * WIDTH) / 8)
-//   {
-//     // get the next byte. It's put in a local variable so it can be sent as
-//     // as soon as possible after the sending of the previous byte has completed
-//     if (clear)
-//     {
-//       c = image[i];
-//       // clear the byte in the image buffer
-//       image[i++] = 0;
+// //   writecommand(ILI9340_PASET); // Row addr set
+// //   writedata(0>>8);
+// //   writedata(0);     // YSTART
+// //   writedata((HEIGHT - 1) >>8);
+// //   writedata(HEIGHT - 1);     // YEND
+
+//   writecommand(ILI9340_RAMWR); // write to RAM
+
+//   SPI.beginTransaction(SPISettings(15000000, MSBFIRST, SPI_MODE0));
+
+//   digitalWrite(_dc, HIGH);
+//   digitalWrite(_cs, LOW);
+
+//     // SPI.transfer((uint8_t *)image, (2 * HEIGHT * WIDTH));
+
+//     for (uint32_t i = 0; i < (HEIGHT * WIDTH); i++) {
+//         SPI.transfer16(image[i]);
 //     }
-//     else
-//       c = image[i++];
 
-//     // while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent
+//   digitalWrite(_cs, HIGH);
+//   SPI.endTransaction();
 
-//     // put the next byte in the SPI data register. The SPI controller will
-//     // clock it out while the loop continues and gets the next byte ready
-//     // SPDR = c;
-//   }
-//   // while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
+//     if (clear) {
+//         for (uint32_t i = 0; i < (WIDTH * HEIGHT); i++) {
+//             image[i] = 0;
+//         }
+//     }
+
+//   return;
+
+// //   uint8_t c;
+// //   int i = 0;
+
+// //   if (clear)
+// //   {
+// //     // SPDR = image[i]; // set the first SPI data byte to get things started
+// //     image[i++] = 0;  // clear the first image byte
+// //   }
+// //   else
+// //     // SPDR = image[i++];
+
+// //   // the code to iterate the loop and get the next byte from the buffer is
+// //   // executed while the previous byte is being sent out by the SPI controller
+// //   while (i < (HEIGHT * WIDTH) / 8)
+// //   {
+// //     // get the next byte. It's put in a local variable so it can be sent as
+// //     // as soon as possible after the sending of the previous byte has completed
+// //     if (clear)
+// //     {
+// //       c = image[i];
+// //       // clear the byte in the image buffer
+// //       image[i++] = 0;
+// //     }
+// //     else
+// //       c = image[i++];
+
+// //     // while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent
+
+// //     // put the next byte in the SPI data register. The SPI controller will
+// //     // clock it out while the loop continues and gets the next byte ready
+// //     // SPDR = c;
+// //   }
+// //   // while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
 }
 
 // bool ArduboyAdvanceCore::waitForDMA()
@@ -695,16 +982,24 @@ void ArduboyAdvanceCore::paintScreen(uint16_t image[], bool clear)
 
 void ArduboyAdvanceCore::blank()
 {
-  for (int i = 0; i < (HEIGHT*WIDTH)/8; i++)
-    SPItransfer(0x00);
+    setAddrWindow(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
+
+    CD_DATA;
+
+    for (uint32_t i = 0; i < SCREEN_BUF_SIZE; i += 2) {
+        write8(0x00);
+        write8(0x00);
+    }
+
+    CS_IDLE;
 }
 
-void ArduboyAdvanceCore::sendLCDCommand(uint8_t command)
-{
-  LCDCommandMode();
-  SPItransfer(command);
-  LCDDataMode();
-}
+// void ArduboyAdvanceCore::sendLCDCommand(uint8_t command)
+// {
+//   LCDCommandMode();
+//   SPItransfer(command);
+//   LCDDataMode();
+// }
 
 // invert the display or set to normal
 // when inverted, a pixel set to 0 will be on
@@ -731,6 +1026,43 @@ void ArduboyAdvanceCore::flipHorizontal(bool flipped)
 {
   sendLCDCommand(flipped ? OLED_HORIZ_FLIPPED : OLED_HORIZ_NORMAL);
 }
+
+
+void ArduboyAdvanceCore::write8(uint8_t c)
+{
+    CS_ACTIVE;
+
+    // digitalWriteFast(TFT_WR, LOW);
+    WR_ACTIVE;
+    *((volatile uint8_t *)(&GPIOC_PDOR)) = c;
+    // digitalWriteFast(TFT_WR, HIGH);
+    WR_IDLE;
+    asm volatile("NOP"); // wait ten ns
+    asm volatile("NOP");
+    asm volatile("NOP");
+    asm volatile("NOP");
+
+    // asm volatile("NOP");
+    // asm volatile("NOP");
+    // asm volatile("NOP");
+    // asm volatile("NOP");
+
+    CS_IDLE;
+}
+
+
+void ArduboyAdvanceCore::writecommand(uint8_t c)
+{
+    CD_COMMAND;
+    write8(c);
+}
+
+
+void ArduboyAdvanceCore::writedata(uint8_t c) {
+    CD_DATA;
+    write8(c);
+}
+
 
 /* RGB LED */
 
@@ -830,7 +1162,7 @@ uint8_t ArduboyAdvanceCore::buttonsState()
 // delay in ms with 16 bit duration
 void ArduboyAdvanceCore::delayShort(uint16_t ms)
 {
-  delay((unsigned long) ms);
+    delay((unsigned long) ms);
 }
 
 
@@ -874,16 +1206,73 @@ void ArduboyAdvanceCore::delayShort(uint16_t ms)
 // }
 
 
-uint8_t ArduboyAdvanceCore::readcommand8(uint8_t c) {
-   digitalWrite(PIN_DC, LOW);
-   digitalWrite(PIN_SCK, LOW);
-   digitalWrite(PIN_CS, LOW);
-  //  spiwrite(c);
-   SPI.transfer(c);
+// uint8_t ArduboyAdvanceCore::readcommand8(uint8_t c) {
+//    digitalWrite(PIN_DC, LOW);
+//    digitalWrite(PIN_SCK, LOW);
+//    digitalWrite(PIN_CS, LOW);
+//   //  spiwrite(c);
+//    SPI.transfer(c);
 
 
-   digitalWrite(PIN_DC, HIGH);
-   uint8_t r = SPI.transfer(0x00);
-   digitalWrite(PIN_CS, HIGH);
-   return r;
+//    digitalWrite(PIN_DC, HIGH);
+//    uint8_t r = SPI.transfer(0x00);
+//    digitalWrite(PIN_CS, HIGH);
+//    return r;
+// }
+
+
+uint8_t ArduboyAdvanceCore::read8(void)
+{
+    RD_ACTIVE;
+    delay(5);
+    uint8_t temp = 0;
+    if(digitalReadFast(PIN_DISP_D0)) {temp |= (1 << 0);} // slow reading but works
+    if(digitalReadFast(PIN_DISP_D1)) {temp |= (1 << 1);}
+    if(digitalReadFast(PIN_DISP_D2)) {temp |= (1 << 2);}
+    if(digitalReadFast(PIN_DISP_D3)) {temp |= (1 << 3);}
+    if(digitalReadFast(PIN_DISP_D4)) {temp |= (1 << 4);}
+    if(digitalReadFast(PIN_DISP_D5)) {temp |= (1 << 5);}
+    if(digitalReadFast(PIN_DISP_D6)) {temp |= (1 << 6);}
+    if(digitalReadFast(PIN_DISP_D7)) {temp |= (1 << 7);}
+    RD_IDLE;
+    delay(5);
+    return temp;
+}
+
+
+uint8_t ArduboyAdvanceCore::readcommand8(uint8_t c)
+{
+    writecommand(c);
+    CS_ACTIVE;
+    CD_DATA;
+    setReadDataBus();
+    delay(5);
+    //single dummy data
+    uint8_t data = read8();
+    //real data
+    data = read8();
+    setWriteDataBus();
+    CS_IDLE;
+    return data;
+}
+
+
+uint32_t ArduboyAdvanceCore::readID(void)
+{
+    writecommand(ILI9341_RDDID);
+
+    CS_ACTIVE;
+    CD_DATA;
+    setReadDataBus();
+    uint32_t r = read8();
+    r <<= 8;
+    r |= read8();
+    r <<= 8;
+    r |= read8();
+    r <<= 8;
+    r |= read8();
+    setWriteDataBus();
+    CS_IDLE;
+
+    return r;
 }

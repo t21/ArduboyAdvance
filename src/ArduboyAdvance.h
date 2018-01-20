@@ -402,7 +402,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * \see display(bool)
    */
-  void display();
+  // void display();
   // Needs implementation
 
   /** \brief
@@ -539,7 +539,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param h The height of the rectangle.
    * \param color The color of the pixel (optional; defaults to WHITE).
    */
-  void fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint16_t color = WHITE);
+  void fillRect(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t color = WHITE);
 
   /** \brief
    * Fill the screen buffer with the specified color.
@@ -558,7 +558,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the semicircles forming the corners.
    * \param color The color of the rectangle (optional; defaults to WHITE).
    */
-  void drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color = WHITE);
+  void drawRoundRect(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t r, uint16_t color = WHITE);
 
   /** \brief
    * Draw a filled-in rectangle with rounded corners.
@@ -570,7 +570,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    * \param r The radius of the semicircles forming the corners.
    * \param color The color of the rectangle (optional; defaults to WHITE).
    */
-  void fillRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color = WHITE);
+  void fillRoundRect(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t r, uint16_t color = WHITE);
 
   /** \brief
    * Draw a triangle given the coordinates of each corner.
@@ -620,7 +620,8 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * The array must be located in program memory by using the PROGMEM modifier.
    */
-  static void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint16_t color = WHITE);
+  static void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
+      uint16_t w, uint16_t h, uint16_t color = WHITE);
 
   /** \brief
    * Draw a bitmap from a horizontally oriented array in program memory.
@@ -692,7 +693,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * \see sBuffer
    */
-  uint16_t* getBuffer();
+  uint8_t* getBuffer();
 
   /** \brief
    * Seed the random number generator with a random value.
@@ -1160,7 +1161,7 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * \see getBuffer()
    */
-  static uint16_t sBuffer[HEIGHT * WIDTH];
+  static uint8_t sBuffer[SCREEN_BUF_SIZE];
 
  protected:
   // helper function for sound enable/disable system control

@@ -11,7 +11,8 @@
 // #include <avr/power.h>
 // #include <avr/sleep.h>
 #include <limits.h>
-#include "Adafruit_ILI9340_defs.h"
+// #include "Adafruit_ILI9340_defs.h"
+#include "ILI9341_defs.h"
 
 
 
@@ -42,26 +43,35 @@
 // ----- Arduboy 3.6 pins -----
 #if defined(ARDUBOY_36)
 
-#define PIN_CS 23      // Display CS Arduino pin number
-// #define CS_PORT 0 //PORTD   // Display CS port
-// #define CS_BIT 0 //PORTD6   // Display CS physical bit number
+// Display control signals
+#define PIN_DISP_CS     18
+#define PIN_DISP_CD     19
+#define PIN_DISP_WR     20
+#define PIN_DISP_RD     21
+#define PIN_DISP_RST    17
 
-#define PIN_DC 16       // Display D/C Arduino pin number
-// #define DC_PORT 0 //PORTD   // Display D/C port
-// #define DC_BIT 0 //PORTD4   // Display D/C physical bit number
+// Display data signals
+#define PIN_DISP_D0     15
+#define PIN_DISP_D1     22
+#define PIN_DISP_D2     23
+#define PIN_DISP_D3     9
+#define PIN_DISP_D4     10
+#define PIN_DISP_D5     13
+#define PIN_DISP_D6     11
+#define PIN_DISP_D7     12
+#define DISP_PORT       GPIOC_PSOR
 
-#define PIN_RST 15       // Display reset Arduino pin number
-// #define RST_PORT 1 //PORTD  // Display reset port
-// #define RST_BIT 1 //PORTD7  // Display reset physical bit number
+// Macros for setting the display control signals
+#define RD_IDLE  	  digitalWriteFast(PIN_DISP_RD, HIGH)
+#define RD_ACTIVE     digitalWriteFast(PIN_DISP_RD, LOW)
+#define WR_IDLE       digitalWriteFast(PIN_DISP_WR, HIGH)
+#define WR_ACTIVE     digitalWriteFast(PIN_DISP_WR, LOW)
+#define CD_COMMAND    digitalWriteFast(PIN_DISP_CD, LOW)
+#define CD_DATA       digitalWriteFast(PIN_DISP_CD, HIGH)
+#define CS_IDLE       digitalWriteFast(PIN_DISP_CS, HIGH)
+#define CS_ACTIVE     digitalWriteFast(PIN_DISP_CS, LOW)
 
-// #define SPI_MOSI_PORT 0 //PORTB
-// #define SPI_MOSI_BIT 0 //PORTB2
-
-// #define PIN_SCK 9
-#define PIN_SCK 0
-// #define SPI_SCK_PORT 0 //PORTB
-// #define SPI_SCK_BIT 0 //PORTB1
-
+// RGB LED
 #define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
 #define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
 #define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
@@ -77,15 +87,15 @@
 
 // bit values for button states
 // these are determined by the buttonsState() function
-#define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
-#define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
-#define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
-#define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
-#define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
-#define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
-#define X_BUTTON 0b00000010
-#define Y_BUTTON 0b00000001
-#define SEL_BUTTON 0b00010000
+#define LEFT_BUTTON     0b00100000  /**< The Left button value for functions requiring a bitmask */
+#define RIGHT_BUTTON    0b01000000 /**< The Right button value for functions requiring a bitmask */
+#define UP_BUTTON       0b10000000    /**< The Up button value for functions requiring a bitmask */
+#define DOWN_BUTTON     0b00010000  /**< The Down button value for functions requiring a bitmask */
+#define A_BUTTON        0b00001000     /**< The A button value for functions requiring a bitmask */
+#define B_BUTTON        0b00000100     /**< The B button value for functions requiring a bitmask */
+#define X_BUTTON        0b00000010
+#define Y_BUTTON        0b00000001
+#define SEL_BUTTON      0b00010000
 
 //Button pins
 //#define PIN_LEFT_BUTTON A2
@@ -390,14 +400,13 @@
 
 // -----
 
-// #define WIDTH 128 /**< The width of the display in pixels */
-// #define HEIGHT 64 /**< The height of the display in pixels */
-#define WIDTH 240 /**< The width of the display in pixels */
-// #define HEIGHT 320 /**< The height of the display in pixels */
-#define HEIGHT 320 /**< The height of the display in pixels */
+// #define SCREEN_WIDTH 240 /**< The width of the display in pixels */
+// #define SCREEN_HEIGHT 320 /**< The height of the display in pixels */
+#define SCREEN_WIDTH 320 /**< The width of the display in pixels */
+#define SCREEN_HEIGHT 240 /**< The height of the display in pixels */
 
-#define COLUMN_ADDRESS_END (WIDTH - 1) & 127   // 128 pixels wide
-#define PAGE_ADDRESS_END ((HEIGHT/8)-1) & 7    // 8 pages high
+#define SCREEN_BUF_SIZE (2 * SCREEN_WIDTH * SCREEN_HEIGHT)
+
 
 /** \brief
  * Lower level functions generally dealing directly with the hardware.
@@ -446,7 +455,7 @@ class ArduboyAdvanceCore
      *
      * \see LCDCommandMode() SPItransfer()
      */
-    void static LCDDataMode();
+    // void static LCDDataMode();
 
     /** \brief
      * Put the display into command mode.
@@ -525,7 +534,7 @@ class ArduboyAdvanceCore
      * In most cases, the defined value `WIDTH` would be better to use instead
      * of this function.
      */
-    uint16_t static width();
+    uint16_t static getWidth();
 
     /** \brief
      * Get the height of the display in pixels.
@@ -536,7 +545,7 @@ class ArduboyAdvanceCore
      * In most cases, the defined value `HEIGHT` would be better to use instead
      * of this function.
      */
-    uint16_t static height();
+    uint16_t static getHeight();
 
     /** \brief
      * Get the current state of all buttons as a bitmask.
@@ -601,7 +610,7 @@ class ArduboyAdvanceCore
      *
      * \see paint8Pixels()
      */
-    void static paintScreen(const uint16_t *image);
+    void static paintScreen(const uint8_t *image);
 
     /** \brief
      * Paints an entire image directly to the display from an array in RAM.
@@ -625,7 +634,7 @@ class ArduboyAdvanceCore
      *
      * \see paint8Pixels()
      */
-    void static paintScreen(uint16_t image[], bool clear = false);
+    void static paintScreen(uint8_t image[], bool clear = false);
 
     /** \brief
      * Blank the display screen by setting all pixels off.
@@ -831,7 +840,7 @@ class ArduboyAdvanceCore
      */
     void static boot();
     // void boot();
-    
+
     /** \brief
      * Allow upload when the bootloader "magic number" could be corrupted.
      *
@@ -871,7 +880,10 @@ class ArduboyAdvanceCore
     void static setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 
     void static spiwrite(uint8_t);
-    
+
+    uint32_t static readID(void);
+
+
   protected:
     // internals
     void static setCPUSpeed8MHz();
@@ -881,22 +893,27 @@ class ArduboyAdvanceCore
     void static bootPowerSaving();
     void static bootTFT();
 
-    bool static waitForDMA();
-  
+    void static setRotation(uint8_t x);
+
+
+    // void static writecommand(uint8_t c);
+    // void static writedata(uint8_t c);
+    // uint8_t static readcommand8(uint8_t c);
+
+    // New Parallel functions
+    void static gpio_init();
+    void static ili9341_init(void);
+
+    void static setWriteDataBus(void);
+    void static setReadDataBus(void);
+
+    void static write8(uint8_t c);
     void static writecommand(uint8_t c);
     void static writedata(uint8_t c);
+
+    uint8_t static read8(void);
     uint8_t static readcommand8(uint8_t c);
 
-
-    // volatile uint8_t *mosiport, *clkport, *dcport, *rsport, *csport;
-    const uint8_t  static _cs   = PIN_CS;
-    const uint8_t  static _dc   = PIN_DC;
-    const uint8_t  static _rst  = PIN_RST;
-    // const uint8_t  static _mosi = 0;
-    const uint8_t  static _sclk = 0;
-    const int16_t  static _width  = WIDTH;
-    const int16_t  static _height = HEIGHT;
-           
   };
 
 #endif

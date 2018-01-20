@@ -12,7 +12,7 @@
 //========== class ArduboyAdvanceBase ==========
 //========================================
 
-uint16_t ArduboyAdvanceBase::sBuffer[];
+uint8_t ArduboyAdvanceBase::sBuffer[];
 
 ArduboyAdvanceBase::ArduboyAdvanceBase()
 {
@@ -33,9 +33,9 @@ ArduboyAdvanceBase::ArduboyAdvanceBase()
 // provides by default
 void ArduboyAdvanceBase::begin()
 {
-  boot(); // raw hardware
+    boot(); // raw hardware
 
-  // blank(); // blank the display
+    blank(); // blank the display
 
   // flashlight(); // light the RGB LED and screen if UP button is being held.
 
@@ -44,17 +44,17 @@ void ArduboyAdvanceBase::begin()
 
   // audio.begin();
 
-  // bootLogo();
-  // alternative logo functions. Work the same a bootLogo() but may reduce
-  // memory size if the sketch uses the same bitmap drawing function
-//  bootLogoCompressed();
-//  bootLogoSpritesSelfMasked();
-//  bootLogoSpritesOverwrite();
+    bootLogo();
+    // alternative logo functions. Work the same a bootLogo() but may reduce
+    // memory size if the sketch uses the same bitmap drawing function
+    // bootLogoCompressed();
+    // bootLogoSpritesSelfMasked();
+    // bootLogoSpritesOverwrite();
 
-  // wait for all buttons to be released
-  do {
-    delayShort(50);
-  } while (buttonsState());
+    // wait for all buttons to be released
+    // do {
+    //     delayShort(50);
+    // } while (buttonsState());
 }
 
 void ArduboyAdvanceBase::flashlight()
@@ -104,12 +104,12 @@ void ArduboyAdvanceBase::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVa
 
 void ArduboyAdvanceBase::bootLogo()
 {
-  bootLogoShell(drawLogoBitmap);
+    bootLogoShell(drawLogoBitmap);
 }
 
 void ArduboyAdvanceBase::drawLogoBitmap(int16_t y)
 {
-  drawBitmap(20, y, arduboy_logo, 88, 16);
+    drawBitmap(20, y, arduboy_advance_logo, 88, 16);
 }
 
 void ArduboyAdvanceBase::bootLogoCompressed()
@@ -146,38 +146,36 @@ void ArduboyAdvanceBase::drawLogoSpritesOverwrite(int16_t y)
 // if changes are made to one, equivalent changes should be made to the other
 void ArduboyAdvanceBase::bootLogoShell(void (*drawLogo)(int16_t))
 {
-  digitalWriteRGB(RED_LED, RGB_ON);
+    digitalWriteRGB(RED_LED, RGB_ON);
 
-  for (int16_t y = -18; y <= 24; y++) {
-    if (pressed(RIGHT_BUTTON)) {
-      digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
-      return;
+    for (int16_t y = -18; y <= 24; y++) {
+        if (pressed(RIGHT_BUTTON)) {
+            digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
+            return;
+        }
+
+        if (y == -4) {
+            digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
+            digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
+        } else if (y == 24) {
+            digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
+            digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
+        }
+
+        (*drawLogo)(y); // call the function that actually draws the logo
+        display(CLEAR_BUFFER);
+        delayShort(27);
+        // longer delay post boot, we put it inside the loop to
+        // save the flash calling clear/delay again outside the loop
+        if (y == -16) {
+            delayShort(250);
+        }
     }
 
-    if (y == -4) {
-      digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
-      digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
-    }
-    else if (y == 24) {
-      digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
-      digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
-    }
+    delayShort(700);
+    digitalWriteRGB(BLUE_LED, RGB_OFF);
 
-    clear();
-    (*drawLogo)(y); // call the function that actually draws the logo
-    display();
-    delayShort(27);
-    // longer delay post boot, we put it inside the loop to
-    // save the flash calling clear/delay again outside the loop
-    if (y==-16) {
-      delayShort(250);
-    }
-  }
-
-  delayShort(700);
-  digitalWriteRGB(BLUE_LED, RGB_OFF);
-
-  bootLogoExtra();
+    bootLogoExtra();
 }
 
 // Virtual function overridden by derived class
@@ -187,12 +185,12 @@ void ArduboyAdvanceBase::bootLogoExtra() { }
 
 void ArduboyAdvanceBase::setFrameRate(uint8_t rate)
 {
-  eachFrameMillis = 1000 / rate;
+    eachFrameMillis = 1000 / rate;
 }
 
 bool ArduboyAdvanceBase::everyXFrames(uint8_t frames)
 {
-  return frameCount % frames == 0;
+    return frameCount % frames == 0;
 }
 
 bool ArduboyAdvanceBase::nextFrame()
@@ -285,522 +283,413 @@ const uint8_t bitshift_left[] PROGMEM = {
 
 void ArduboyAdvanceBase::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
-  // #ifdef PIXEL_SAFE_MODE
-  if (x < 0 || x > (WIDTH - 1) || y < 0 || y > (HEIGHT - 1))
-  {
-    return;
-  }
-  // #endif
+    if (x < 0 || x > (SCREEN_WIDTH - 1) || y < 0 || y > (SCREEN_HEIGHT - 1)) {
+        return;
+    }
 
-  // uint16_t row_offset;
-  // uint8_t bit;
+    uint32_t pixel = 2 * (x + y * SCREEN_WIDTH);
 
-  // uint8_t row = (uint8_t)y / 8;
-  // row_offset = (row*WIDTH) + (uint8_t)x;
-  // bit = _BV((uint8_t)y % 8);
-
-  uint32_t pixel = x + y * WIDTH;
-
-  // the above math can also be rewritten more simply as;
-  //   row_offset = (y * WIDTH/8) & ~0b01111111 + (uint8_t)x;
-  // which is what the below assembler does
-
-  // local variable for the bitshift_left array pointer,
-  // which can be declared a read-write operand
-  // const uint8_t* bsl = bitshift_left;
-
-  // asm volatile
-  // (
-  //   "mul %[width_offset], %A[y]\n"
-  //   "movw %[row_offset], r0\n"
-  //   "andi %A[row_offset], 0x80\n" // row_offset &= (~0b01111111);
-  //   "clr __zero_reg__\n"
-  //   "add %A[row_offset], %[x]\n"
-  //   // mask for only 0-7
-  //   "andi %A[y], 0x07\n"
-  //   // Z += y
-  //   "add r30, %A[y]\n"
-  //   "adc r31, __zero_reg__\n"
-  //   // load correct bitshift from program RAM
-  //   "lpm %[bit], Z\n"
-  //   : [row_offset] "=&x" (row_offset), // upper register (ANDI)
-  //     [bit] "=r" (bit),
-  //     [y] "+d" (y), // upper register (ANDI), must be writable
-  //     "+z" (bsl) // is modified to point to the proper shift array element
-  //   : [width_offset] "r" ((uint8_t)(WIDTH/8)),
-  //     [x] "r" ((uint8_t)x)
-  //   :
-  // );
-
-  if (color) {
-    sBuffer[pixel] = color;
-  } else {
-    sBuffer[pixel] = BLACK;
-  }
+    sBuffer[pixel] = color >> 8;
+    sBuffer[pixel + 1] = color;
 }
 
 uint16_t ArduboyAdvanceBase::getPixel(uint16_t x, uint16_t y)
 {
-  // uint8_t row = y / 8;
-  // uint8_t bit_position = y % 8;
+    uint16_t color_hi_byte = sBuffer[2 * (x + y * SCREEN_WIDTH)];
+    uint16_t color_lo_byte = sBuffer[2 * (x + y * SCREEN_WIDTH) + 1];
 
-    return (sBuffer[x + y * WIDTH]);
-  
-  // return (sBuffer[(row*WIDTH) + x] & (1 << bit_position)) >> bit_position;
+    return (color_hi_byte << 8) | color_lo_byte;
 }
 
-void ArduboyAdvanceBase::drawCircle(int16_t x0, int16_t y0, uint16_t r, uint16_t color)
+void ArduboyAdvanceBase::drawCircle(int16_t x0, int16_t y0, uint16_t r,
+        uint16_t color)
 {
-  int16_t f = 1 - r;
-  int16_t ddF_x = 1;
-  int16_t ddF_y = -2 * r;
-  int16_t x = 0;
-  int16_t y = r;
+    int16_t f = 1 - r;
+    int16_t ddF_x = 1;
+    int16_t ddF_y = -2 * r;
+    int16_t x = 0;
+    int16_t y = r;
 
-  drawPixel(x0, y0+r, color);
-  drawPixel(x0, y0-r, color);
-  drawPixel(x0+r, y0, color);
-  drawPixel(x0-r, y0, color);
+    drawPixel(x0, y0 + r, color);
+    drawPixel(x0, y0 - r, color);
+    drawPixel(x0 + r, y0, color);
+    drawPixel(x0 - r, y0, color);
 
-  while (x<y)
-  {
-    if (f >= 0)
-    {
-      y--;
-      ddF_y += 2;
-      f += ddF_y;
+    while (x < y) {
+        if (f >= 0) {
+            y--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+
+        x++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        drawPixel(x0 + x, y0 + y, color);
+        drawPixel(x0 - x, y0 + y, color);
+        drawPixel(x0 + x, y0 - y, color);
+        drawPixel(x0 - x, y0 - y, color);
+        drawPixel(x0 + y, y0 + x, color);
+        drawPixel(x0 - y, y0 + x, color);
+        drawPixel(x0 + y, y0 - x, color);
+        drawPixel(x0 - y, y0 - x, color);
     }
-
-    x++;
-    ddF_x += 2;
-    f += ddF_x;
-
-    drawPixel(x0 + x, y0 + y, color);
-    drawPixel(x0 - x, y0 + y, color);
-    drawPixel(x0 + x, y0 - y, color);
-    drawPixel(x0 - x, y0 - y, color);
-    drawPixel(x0 + y, y0 + x, color);
-    drawPixel(x0 - y, y0 + x, color);
-    drawPixel(x0 + y, y0 - x, color);
-    drawPixel(x0 - y, y0 - x, color);
-  }
 }
 
-void ArduboyAdvanceBase::drawCircleHelper(int16_t x0, int16_t y0, uint16_t r, uint16_t corners, uint16_t color)
+void ArduboyAdvanceBase::drawCircleHelper(int16_t x0, int16_t y0, uint16_t r,
+        uint16_t corners, uint16_t color)
 {
-  int16_t f = 1 - r;
-  int16_t ddF_x = 1;
-  int16_t ddF_y = -2 * r;
-  int16_t x = 0;
-  int16_t y = r;
+    int16_t f = 1 - r;
+    int16_t ddF_x = 1;
+    int16_t ddF_y = -2 * r;
+    int16_t x = 0;
+    int16_t y = r;
 
-  while (x<y)
-  {
-    if (f >= 0)
-    {
-      y--;
-      ddF_y += 2;
-      f += ddF_y;
-    }
+    while (x < y) {
+        if (f >= 0) {
+            y--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
 
-    x++;
-    ddF_x += 2;
-    f += ddF_x;
+        x++;
+        ddF_x += 2;
+        f += ddF_x;
 
-    if (corners & 0x4) // lower right
-    {
-      drawPixel(x0 + x, y0 + y, color);
-      drawPixel(x0 + y, y0 + x, color);
+        if (corners & 0x4) {    // lower right
+            drawPixel(x0 + x, y0 + y, color);
+            drawPixel(x0 + y, y0 + x, color);
+        }
+
+        if (corners & 0x2) {    // upper right
+            drawPixel(x0 + x, y0 - y, color);
+            drawPixel(x0 + y, y0 - x, color);
+        }
+
+        if (corners & 0x8) {    // lower left
+            drawPixel(x0 - y, y0 + x, color);
+            drawPixel(x0 - x, y0 + y, color);
+        }
+
+        if (corners & 0x1) {    // upper left
+            drawPixel(x0 - y, y0 - x, color);
+            drawPixel(x0 - x, y0 - y, color);
+        }
     }
-    if (corners & 0x2) // upper right
-    {
-      drawPixel(x0 + x, y0 - y, color);
-      drawPixel(x0 + y, y0 - x, color);
-    }
-    if (corners & 0x8) // lower left
-    {
-      drawPixel(x0 - y, y0 + x, color);
-      drawPixel(x0 - x, y0 + y, color);
-    }
-    if (corners & 0x1) // upper left
-    {
-      drawPixel(x0 - y, y0 - x, color);
-      drawPixel(x0 - x, y0 - y, color);
-    }
-  }
 }
 
-void ArduboyAdvanceBase::fillCircle(int16_t x0, int16_t y0, uint16_t r, uint16_t color)
+void ArduboyAdvanceBase::fillCircle(int16_t x0, int16_t y0, uint16_t r,
+        uint16_t color)
 {
-  drawFastVLine(x0, y0-r, 2*r+1, color);
-  fillCircleHelper(x0, y0, r, 3, 0, color);
+    drawFastVLine(x0, y0 - r, 2 * r + 1, color);
+    fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 
-void ArduboyAdvanceBase::fillCircleHelper(int16_t x0, int16_t y0, uint16_t r, uint16_t sides, int16_t delta, uint16_t color)
+void ArduboyAdvanceBase::fillCircleHelper(int16_t x0, int16_t y0, uint16_t r,
+        uint16_t sides, int16_t delta, uint16_t color)
 {
-  int16_t f = 1 - r;
-  int16_t ddF_x = 1;
-  int16_t ddF_y = -2 * r;
-  int16_t x = 0;
-  int16_t y = r;
+    int16_t f = 1 - r;
+    int16_t ddF_x = 1;
+    int16_t ddF_y = -2 * r;
+    int16_t x = 0;
+    int16_t y = r;
 
-  while (x < y)
-  {
-    if (f >= 0)
-    {
-      y--;
-      ddF_y += 2;
-      f += ddF_y;
+    while (x < y) {
+        if (f >= 0) {
+            y--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+
+        x++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        if (sides & 0x1) {  // right side
+            drawFastVLine(x0 + x, y0 - y, 2 * y + 1 + delta, color);
+            drawFastVLine(x0 + y, y0 - x, 2 * x + 1 + delta, color);
+        }
+
+        if (sides & 0x2) {  // left side
+            drawFastVLine(x0 - x, y0 - y, 2 * y + 1 + delta, color);
+            drawFastVLine(x0 - y, y0 - x, 2 * x + 1 + delta, color);
+        }
     }
-
-    x++;
-    ddF_x += 2;
-    f += ddF_x;
-
-    if (sides & 0x1) // right side
-    {
-      drawFastVLine(x0+x, y0-y, 2*y+1+delta, color);
-      drawFastVLine(x0+y, y0-x, 2*x+1+delta, color);
-    }
-
-    if (sides & 0x2) // left side
-    {
-      drawFastVLine(x0-x, y0-y, 2*y+1+delta, color);
-      drawFastVLine(x0-y, y0-x, 2*x+1+delta, color);
-    }
-  }
 }
 
-void ArduboyAdvanceBase::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
+void ArduboyAdvanceBase::drawLine(int16_t x0, int16_t y0, int16_t x1,
+        int16_t y1, uint16_t color)
 {
-  // bresenham's algorithm - thx wikpedia
-  bool steep = abs(y1 - y0) > abs(x1 - x0);
-  if (steep) {
-    swap(x0, y0);
-    swap(x1, y1);
-  }
-
-  if (x0 > x1) {
-    swap(x0, x1);
-    swap(y0, y1);
-  }
-
-  int16_t dx, dy;
-  dx = x1 - x0;
-  dy = abs(y1 - y0);
-
-  int16_t err = dx / 2;
-  int8_t ystep;
-
-  if (y0 < y1)
-  {
-    ystep = 1;
-  }
-  else
-  {
-    ystep = -1;
-  }
-
-  for (; x0 <= x1; x0++)
-  {
-    if (steep)
-    {
-      drawPixel(y0, x0, color);
-    }
-    else
-    {
-      drawPixel(x0, y0, color);
+    // bresenham's algorithm - thx wikpedia
+    bool steep = abs(y1 - y0) > abs(x1 - x0);
+    if (steep) {
+        swap(x0, y0);
+        swap(x1, y1);
     }
 
-    err -= dy;
-    if (err < 0)
-    {
-      y0 += ystep;
-      err += dx;
+    if (x0 > x1) {
+        swap(x0, x1);
+        swap(y0, y1);
     }
-  }
+
+    int16_t dx, dy;
+    dx = x1 - x0;
+    dy = abs(y1 - y0);
+
+    int16_t err = dx / 2;
+    int8_t ystep;
+
+    if (y0 < y1) {
+        ystep = 1;
+    } else {
+        ystep = -1;
+    }
+
+    for (; x0 <= x1; x0++) {
+        if (steep) {
+            drawPixel(y0, x0, color);
+        } else {
+            drawPixel(x0, y0, color);
+        }
+
+        err -= dy;
+        if (err < 0) {
+            y0 += ystep;
+            err += dx;
+        }
+    }
 }
 
-void ArduboyAdvanceBase::drawRect(int16_t x, int16_t y, uint16_t w, uint16_t h, uint16_t color)
+void ArduboyAdvanceBase::drawRect(int16_t x, int16_t y, uint16_t w, uint16_t h,
+        uint16_t color)
 {
-  drawFastHLine(x, y, w, color);
-  drawFastHLine(x, y+h-1, w, color);
-  drawFastVLine(x, y, h, color);
-  drawFastVLine(x+w-1, y, h, color);
+    drawFastHLine(x, y, w, color);
+    drawFastHLine(x, y+h-1, w, color);
+    drawFastVLine(x, y, h, color);
+    drawFastVLine(x+w-1, y, h, color);
 }
 
-void ArduboyAdvanceBase::drawFastVLine(int16_t x, int16_t y, uint16_t h, uint16_t color)
+void ArduboyAdvanceBase::drawFastVLine(int16_t x, int16_t y, uint16_t h,
+        uint16_t color)
 {
-  uint16_t len = h - y;
-  uint32_t startPixel = x + y * WIDTH;
+    // Check if we are out of bounds in x-direction
+    if ((x < 0) || (x >= SCREEN_WIDTH)) {
+        return;
+    }
 
-  for (int i = 0; i < len; i++) {
-    sBuffer[startPixel + i * WIDTH] = color;
-  }
+    // Don't start before the top edge
+    if (y < 0) {
+        y = 0;
+    }
+
+    // Don't end past the bottom edge
+    if ((y + h) > SCREEN_HEIGHT) {
+        h = SCREEN_HEIGHT - y;
+    }
+
+    uint32_t startPixel = 2 * (x + y * SCREEN_WIDTH);
+
+    for (uint32_t i = 0; i < (2 * h); i += 2) {
+        sBuffer[startPixel + i * SCREEN_WIDTH] = color >> 8;
+        sBuffer[startPixel + i * SCREEN_WIDTH + 1] = color;
+    }
 
   return;
-
-  int end = y+h;
-  for (int a = max(0,y); a < min(end,HEIGHT); a++)
-  {
-    drawPixel(x,a,color);
-  }
 }
 
-void ArduboyAdvanceBase::drawFastHLine(int16_t x, int16_t y, uint16_t w, uint16_t color)
+void ArduboyAdvanceBase::drawFastHLine(int16_t x, int16_t y, uint16_t w,
+        uint16_t color)
 {
-  int16_t xEnd; // last x point + 1
+    // Check if we are out of bounds in y-direction
+    if (y < 0 || y >= SCREEN_HEIGHT) {
+        return;
+    }
 
-  // Do y bounds checks
-  if (y < 0 || y >= HEIGHT)
+    // Don't start before the left edge
+    if (x < 0) {
+        x = 0;
+    }
+
+    // Don't end past the right edge
+    if ((x + w) > SCREEN_WIDTH) {
+        w = SCREEN_WIDTH - x;
+    }
+
+    uint32_t startPixel = 2 * (x + y * SCREEN_WIDTH);
+
+    for (uint32_t i = 0; i < (2 * w); i += 2) {
+        sBuffer[startPixel + i] = color >> 8;
+        sBuffer[startPixel + i + 1] = color;
+    }
+
     return;
-
-  xEnd = x + w;
-
-  // Check if the entire line is not on the display
-  if (xEnd <= 0 || x >= WIDTH)
-    return;
-
-  // Don't start before the left edge
-  if (x < 0)
-    x = 0;
-
-  // Don't end past the right edge
-  if (xEnd > WIDTH)
-    xEnd = WIDTH;
-
-  // calculate actual width (even if unchanged)
-  w = xEnd - x;
-
-  uint32_t startPixel = x + y * WIDTH;
-
-  for (int16_t i = 0; i < w; i++) {
-    sBuffer[startPixel + i] = color;
-  }
-
-  return;
-
-  // buffer pointer plus row offset + x offset
-  register uint16_t *pBuf = sBuffer + ((y / 8) * WIDTH) + x;
-
-  // pixel mask
-  register uint8_t mask = 1 << (y & 7);
-
-  switch (color)
-  {
-    case WHITE:
-      while (w--)
-      {
-        *pBuf++ |= mask;
-      }
-      break;
-
-    case BLACK:
-      mask = ~mask;
-      while (w--)
-      {
-        *pBuf++ &= mask;
-      }
-      break;
-  }
 }
 
-void ArduboyAdvanceBase::fillRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint16_t color)
+void ArduboyAdvanceBase::fillRect(int16_t x, int16_t y, uint16_t w, uint16_t h,
+        uint16_t color)
 {
-  // stupidest version - update in subclasses if desired!
-  for (int16_t i=x; i<x+w; i++)
-  {
-    drawFastVLine(i, y, h, color);
-  }
+    for (int16_t i = x; i < (x + w); i++) {
+        drawFastVLine(i, y, h, color);
+    }
 }
 
-// Done
 void ArduboyAdvanceBase::fillScreen(uint16_t color)
 {
-    for (uint32_t i = 0; i < (WIDTH * HEIGHT); i++) {
-        sBuffer[i] = color;
+    for (uint32_t i = 0; i < SCREEN_BUF_SIZE; i += 2) {
+        sBuffer[i] = color >> 8;
+        sBuffer[i + 1] = color;
     }
 }
 
-void ArduboyAdvanceBase::drawRoundRect(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color)
+void ArduboyAdvanceBase::drawRoundRect(int16_t x, int16_t y, uint16_t w,
+        uint16_t h, uint16_t r, uint16_t color)
 {
-  // smarter version
-  drawFastHLine(x+r, y, w-2*r, color); // Top
-  drawFastHLine(x+r, y+h-1, w-2*r, color); // Bottom
-  drawFastVLine(x, y+r, h-2*r, color); // Left
-  drawFastVLine(x+w-1, y+r, h-2*r, color); // Right
-  // draw four corners
-  drawCircleHelper(x+r, y+r, r, 1, color);
-  drawCircleHelper(x+w-r-1, y+r, r, 2, color);
-  drawCircleHelper(x+w-r-1, y+h-r-1, r, 4, color);
-  drawCircleHelper(x+r, y+h-r-1, r, 8, color);
+    // draw sides
+    drawFastHLine((x + r), y, (w - 2 * r), color);              // Top
+    drawFastHLine((x + r), (y + h - 1), (w - 2 * r), color);    // Bottom
+    drawFastVLine(x, (y + r), (h - 2 * r), color);              // Left
+    drawFastVLine((x + w - 1), (y + r), (h - 2 * r), color);    // Right
+
+    // draw four corners
+    drawCircleHelper((x + r), (y + r), r, 1, color);
+    drawCircleHelper((x + w - r - 1), (y + r), r, 2, color);
+    drawCircleHelper((x + w - r - 1), (y + h - r - 1), r, 4, color);
+    drawCircleHelper((x + r), (y + h - r - 1), r, 8, color);
 }
 
-void ArduboyAdvanceBase::fillRoundRect
-(int16_t x, int16_t y, uint8_t w, uint8_t h, uint8_t r, uint16_t color)
+void ArduboyAdvanceBase::fillRoundRect(int16_t x, int16_t y, uint16_t w,
+        uint16_t h, uint16_t r, uint16_t color)
 {
-  // smarter version
-  fillRect(x+r, y, w-2*r, h, color);
+    fillRect((x + r), y, (w - 2 * r), h, color);
 
-  // draw four corners
-  fillCircleHelper(x+w-r-1, y+r, r, 1, h-2*r-1, color);
-  fillCircleHelper(x+r, y+r, r, 2, h-2*r-1, color);
+    // draw four corners
+    fillCircleHelper((x + w - r - 1), (y + r), r, 1, (h - 2 * r - 1), color);
+    fillCircleHelper((x + r), (y + r), r, 2, (h - 2 * r - 1), color);
 }
 
-void ArduboyAdvanceBase::drawTriangle
-(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+void ArduboyAdvanceBase::drawTriangle(int16_t x0, int16_t y0, int16_t x1,
+        int16_t y1, int16_t x2, int16_t y2, uint16_t color)
 {
-  drawLine(x0, y0, x1, y1, color);
-  drawLine(x1, y1, x2, y2, color);
-  drawLine(x2, y2, x0, y0, color);
+    drawLine(x0, y0, x1, y1, color);
+    drawLine(x1, y1, x2, y2, color);
+    drawLine(x2, y2, x0, y0, color);
 }
 
-void ArduboyAdvanceBase::fillTriangle
-(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+void ArduboyAdvanceBase::fillTriangle(int16_t x0, int16_t y0, int16_t x1,
+        int16_t y1, int16_t x2, int16_t y2, uint16_t color)
 {
+    int16_t a, b, y, last;
 
-  int16_t a, b, y, last;
-  // Sort coordinates by Y order (y2 >= y1 >= y0)
-  if (y0 > y1)
-  {
-    swap(y0, y1); swap(x0, x1);
-  }
-  if (y1 > y2)
-  {
-    swap(y2, y1); swap(x2, x1);
-  }
-  if (y0 > y1)
-  {
-    swap(y0, y1); swap(x0, x1);
-  }
-
-  if(y0 == y2)
-  { // Handle awkward all-on-same-line case as its own thing
-    a = b = x0;
-    if(x1 < a)
-    {
-      a = x1;
-    }
-    else if(x1 > b)
-    {
-      b = x1;
-    }
-    if(x2 < a)
-    {
-      a = x2;
-    }
-    else if(x2 > b)
-    {
-      b = x2;
-    }
-    drawFastHLine(a, y0, b-a+1, color);
-    return;
-  }
-
-  int16_t dx01 = x1 - x0,
-      dy01 = y1 - y0,
-      dx02 = x2 - x0,
-      dy02 = y2 - y0,
-      dx12 = x2 - x1,
-      dy12 = y2 - y1,
-      sa = 0,
-      sb = 0;
-
-  // For upper part of triangle, find scanline crossings for segments
-  // 0-1 and 0-2.  If y1=y2 (flat-bottomed triangle), the scanline y1
-  // is included here (and second loop will be skipped, avoiding a /0
-  // error there), otherwise scanline y1 is skipped here and handled
-  // in the second loop...which also avoids a /0 error here if y0=y1
-  // (flat-topped triangle).
-  if (y1 == y2)
-  {
-    last = y1;   // Include y1 scanline
-  }
-  else
-  {
-    last = y1-1; // Skip it
-  }
-
-
-  for(y = y0; y <= last; y++)
-  {
-    a   = x0 + sa / dy01;
-    b   = x0 + sb / dy02;
-    sa += dx01;
-    sb += dx02;
-
-    if(a > b)
-    {
-      swap(a,b);
+    // Sort coordinates by Y order (y2 >= y1 >= y0)
+    if (y0 > y1) {
+        swap(y0, y1);
+        swap(x0, x1);
     }
 
-    drawFastHLine(a, y, b-a+1, color);
-  }
-
-  // For lower part of triangle, find scanline crossings for segments
-  // 0-2 and 1-2.  This loop is skipped if y1=y2.
-  sa = dx12 * (y - y1);
-  sb = dx02 * (y - y0);
-
-  for(; y <= y2; y++)
-  {
-    a   = x1 + sa / dy12;
-    b   = x0 + sb / dy02;
-    sa += dx12;
-    sb += dx02;
-
-    if(a > b)
-    {
-      swap(a,b);
+    if (y1 > y2) {
+        swap(y2, y1);
+        swap(x2, x1);
     }
 
-    drawFastHLine(a, y, b-a+1, color);
-  }
-}
+    if (y0 > y1) {
+        swap(y0, y1);
+        swap(x0, x1);
+    }
 
-void ArduboyAdvanceBase::drawBitmap
-(int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h,
- uint16_t color)
-{
-  // no need to draw at all if we're offscreen
-  if (x+w < 0 || x > WIDTH-1 || y+h < 0 || y > HEIGHT-1)
-    return;
-
-  int yOffset = abs(y) % 8;
-  int sRow = y / 8;
-  if (y < 0) {
-    sRow--;
-    yOffset = 8 - yOffset;
-  }
-  int rows = h/8;
-  if (h%8!=0) rows++;
-  for (int a = 0; a < rows; a++) {
-    int bRow = sRow + a;
-    if (bRow > (HEIGHT/8)-1) break;
-    if (bRow > -2) {
-      for (int iCol = 0; iCol<w; iCol++) {
-        if (iCol + x > (WIDTH-1)) break;
-        if (iCol + x >= 0) {
-          if (bRow >= 0) {
-            if (color == WHITE)
-              sBuffer[(bRow*WIDTH) + x + iCol] |= pgm_read_byte(bitmap+(a*w)+iCol) << yOffset;
-            else if (color == BLACK)
-              sBuffer[(bRow*WIDTH) + x + iCol] &= ~(pgm_read_byte(bitmap+(a*w)+iCol) << yOffset);
-            else
-              sBuffer[(bRow*WIDTH) + x + iCol] ^= pgm_read_byte(bitmap+(a*w)+iCol) << yOffset;
-          }
-          if (yOffset && bRow<(HEIGHT/8)-1 && bRow > -2) {
-            if (color == WHITE)
-              sBuffer[((bRow+1)*WIDTH) + x + iCol] |= pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset);
-            else if (color == BLACK)
-              sBuffer[((bRow+1)*WIDTH) + x + iCol] &= ~(pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset));
-            else
-              sBuffer[((bRow+1)*WIDTH) + x + iCol] ^= pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset);
-          }
+    // Handle awkward all-on-same-line case as its own thing
+    if (y0 == y2) {
+        a = b = x0;
+        if (x1 < a) {
+            a = x1;
+        } else if (x1 > b) {
+            b = x1;
         }
-      }
+        if (x2 < a) {
+            a = x2;
+        } else if (x2 > b) {
+            b = x2;
+        }
+        drawFastHLine(a, y0, (b - a + 1), color);
+        return;
     }
-  }
+
+    int16_t dx01 = x1 - x0;
+    int16_t dy01 = y1 - y0;
+    int16_t dx02 = x2 - x0;
+    int16_t dy02 = y2 - y0;
+    int16_t dx12 = x2 - x1;
+    int16_t dy12 = y2 - y1;
+    int16_t sa = 0;
+    int16_t sb = 0;
+
+    // For upper part of triangle, find scanline crossings for segments
+    // 0-1 and 0-2.  If y1=y2 (flat-bottomed triangle), the scanline y1
+    // is included here (and second loop will be skipped, avoiding a /0
+    // error there), otherwise scanline y1 is skipped here and handled
+    // in the second loop...which also avoids a /0 error here if y0=y1
+    // (flat-topped triangle).
+    if (y1 == y2) {
+        last = y1;   // Include y1 scanline
+    } else {
+        last = y1 - 1; // Skip it
+    }
+
+    for (y = y0; y <= last; y++) {
+        a   = x0 + sa / dy01;
+        b   = x0 + sb / dy02;
+        sa += dx01;
+        sb += dx02;
+
+        if (a > b) {
+            swap(a,b);
+        }
+
+        drawFastHLine(a, y, (b - a + 1), color);
+    }
+
+    // For lower part of triangle, find scanline crossings for segments
+    // 0-2 and 1-2.  This loop is skipped if y1=y2.
+    sa = dx12 * (y - y1);
+    sb = dx02 * (y - y0);
+
+    for (; y <= y2; y++) {
+        a   = x1 + sa / dy12;
+        b   = x0 + sb / dy02;
+        sa += dx12;
+        sb += dx02;
+
+        if (a > b) {
+            swap(a,b);
+        }
+
+        drawFastHLine(a, y, (b - a + 1), color);
+    }
+}
+
+void ArduboyAdvanceBase::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
+        uint16_t w, uint16_t h, uint16_t color)
+{
+    // no need to draw at all if we're offscreen
+    if ((x + w) < 0 || x > (SCREEN_WIDTH - 1) || (y + h) < 0 || y > (SCREEN_HEIGHT - 1)) {
+        return;
+    }
+
+    uint32_t startpixel = 2 * (x + y * SCREEN_WIDTH);
+
+    for (uint32_t row = 0; row < h; row++) {
+        for (uint32_t col = 0; col < w; col++) {
+
+            if ((x + col) < (SCREEN_WIDTH - 1) && (y + row) < (SCREEN_HEIGHT - 1)) {
+                sBuffer[startpixel + 2 * (col + row * SCREEN_WIDTH)] =
+                        bitmap[2 * (col + row * w)];
+                sBuffer[startpixel + 2 * (col + row * SCREEN_WIDTH) + 1] =
+                        bitmap[2 * (col + row * w) + 1];
+            }
+        }
+    }
+
+    return;
 }
 
 
@@ -808,7 +697,7 @@ void ArduboyAdvanceBase::drawSlowXYBitmap
 (int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint16_t color)
 {
   // no need to draw at all of we're offscreen
-  if (x+w < 0 || x > WIDTH-1 || y+h < 0 || y > HEIGHT-1)
+  if (x+w < 0 || x > SCREEN_WIDTH-1 || y+h < 0 || y > SCREEN_HEIGHT-1)
     return;
 
   int16_t xi, yi, byteWidth = (w + 7) / 8;
@@ -873,7 +762,7 @@ void ArduboyAdvanceBase::drawCompressed(int16_t sx, int16_t sy, const uint8_t *b
   col = getval(1); // starting colour
 
   // no need to draw at all if we're offscreen
-  if (sx + w < 0 || sx > WIDTH - 1 || sy + h < 0 || sy > HEIGHT - 1)
+  if (sx + w < 0 || sx > SCREEN_WIDTH - 1 || sy + h < 0 || sy > SCREEN_HEIGHT - 1)
     return;
 
   // sy = sy - (frame*h);
@@ -915,24 +804,24 @@ void ArduboyAdvanceBase::drawCompressed(int16_t sx, int16_t sy, const uint8_t *b
         int bRow = sRow + a;
 
         //if (byte) // possible optimisation
-        if (bRow <= (HEIGHT / 8) - 1)
+        if (bRow <= (SCREEN_HEIGHT / 8) - 1)
           if (bRow > -2)
-            if (iCol + sx <= (WIDTH - 1))
+            if (iCol + sx <= (SCREEN_WIDTH - 1))
               if (iCol + sx >= 0) {
 
                 if (bRow >= 0)
                 {
                   if (color)
-                    sBuffer[(bRow * WIDTH) + sx + iCol] |= byte << yOffset;
+                    sBuffer[(bRow * SCREEN_WIDTH) + sx + iCol] |= byte << yOffset;
                   else
-                    sBuffer[(bRow * WIDTH) + sx + iCol] &= ~(byte << yOffset);
+                    sBuffer[(bRow * SCREEN_WIDTH) + sx + iCol] &= ~(byte << yOffset);
                 }
-                if (yOffset && bRow < (HEIGHT / 8) - 1 && bRow > -2)
+                if (yOffset && bRow < (SCREEN_HEIGHT / 8) - 1 && bRow > -2)
                 {
                   if (color)
-                    sBuffer[((bRow + 1)*WIDTH) + sx + iCol] |= byte >> (8 - yOffset);
+                    sBuffer[((bRow + 1)*SCREEN_WIDTH) + sx + iCol] |= byte >> (8 - yOffset);
                   else
-                    sBuffer[((bRow + 1)*WIDTH) + sx + iCol] &= ~(byte >> (8 - yOffset));
+                    sBuffer[((bRow + 1)*SCREEN_WIDTH) + sx + iCol] &= ~(byte >> (8 - yOffset));
                 }
               }
 
@@ -953,22 +842,20 @@ void ArduboyAdvanceBase::drawCompressed(int16_t sx, int16_t sy, const uint8_t *b
   }
 }
 
-void ArduboyAdvanceBase::display()
-{
-  Serial.println("ArduboyAdvanceBase::display()");
-  paintScreen(sBuffer);
-}
+// void ArduboyAdvanceBase::display()
+// {
+//   Serial.println("ArduboyAdvanceBase::display()");
+//   paintScreen(sBuffer);
+// }
 
 void ArduboyAdvanceBase::display(bool clear)
 {
-//   Serial.println("ArduboyAdvanceBase::display(bool clear)");
-//   Serial.println(__func__);
     paintScreen(sBuffer, clear);
 }
 
-uint16_t* ArduboyAdvanceBase::getBuffer()
+uint8_t* ArduboyAdvanceBase::getBuffer()
 {
-  return sBuffer;
+    return sBuffer;
 }
 
 bool ArduboyAdvanceBase::pressed(uint8_t buttons)
@@ -1080,62 +967,60 @@ void ArduboyAdvanceBase::swap(int16_t& a, int16_t& b)
 }
 
 
-//====================================
+//==========================================
 //========== class ArduboyAdvance ==========
-//====================================
+//==========================================
 
 ArduboyAdvance::ArduboyAdvance()
 {
-  cursor_x = 0;
-  cursor_y = 0;
-  textColor = 1;
-  textBackground = 0;
-  textSize = 1;
-  textWrap = 0;
+    cursor_x = 0;
+    cursor_y = 0;
+    textColor = 1;
+    textBackground = 0;
+    textSize = 1;
+    textWrap = 0;
 }
 
 // bootLogoText() should be kept in sync with bootLogoShell()
 // if changes are made to one, equivalent changes should be made to the other
 void ArduboyAdvance::bootLogoText()
 {
-  digitalWriteRGB(RED_LED, RGB_ON);
+    digitalWriteRGB(RED_LED, RGB_ON);
 
-  textSize = 2;
+    textSize = 2;
 
-  for (int8_t y = -18; y <= 24; y++) {
-    if (pressed(RIGHT_BUTTON)) {
-      digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
-      textSize = 1;
-      return;
+    for (int8_t y = -18; y <= 24; y++) {
+        if (pressed(RIGHT_BUTTON)) {
+            digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
+            textSize = 1;
+        return;
+        }
+
+        if (y == -4) {
+            digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
+            digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
+        } else if (y == 24) {
+            digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
+            digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
+        }
+
+        cursor_x = 23;
+        cursor_y = y;
+        print("ARDUBOY");
+        display(CLEAR_BUFFER);
+        delayShort(27);
+        // longer delay post boot, we put it inside the loop to
+        // save the flash calling clear/delay again outside the loop
+        if (y == -16) {
+            delayShort(250);
+        }
     }
 
-    if (y == -4) {
-      digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
-      digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
-    }
-    else if (y == 24) {
-      digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
-      digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
-    }
+    delayShort(700);
+    digitalWriteRGB(BLUE_LED, RGB_OFF);
+    textSize = 1;
 
-    clear();
-    cursor_x = 23;
-    cursor_y = y;
-    print("ARDUBOY");
-    display();
-    delayShort(27);
-    // longer delay post boot, we put it inside the loop to
-    // save the flash calling clear/delay again outside the loop
-    if (y==-16) {
-      delayShort(250);
-    }
-  }
-
-  delayShort(700);
-  digitalWriteRGB(BLUE_LED, RGB_OFF);
-  textSize = 1;
-
-  bootLogoExtra();
+    bootLogoExtra();
 }
 
 void ArduboyAdvance::bootLogoExtra()
@@ -1182,7 +1067,7 @@ size_t ArduboyAdvance::write(uint8_t c)
   {
     drawChar(cursor_x, cursor_y, c, textColor, textBackground, textSize);
     cursor_x += textSize * 6;
-    if (textWrap && (cursor_x > (WIDTH - textSize * 6)))
+    if (textWrap && (cursor_x > (SCREEN_WIDTH - textSize * 6)))
     {
       // calling ourselves recursively for 'newline' is
       // 12 bytes smaller than doing the same math here
@@ -1199,8 +1084,8 @@ void ArduboyAdvance::drawChar
   bool draw_background = bg != color;
   const unsigned char* bitmap = font + c * 5;
 
-  if ((x >= WIDTH) ||              // Clip right
-      (y >= HEIGHT) ||             // Clip bottom
+  if ((x >= SCREEN_WIDTH) ||              // Clip right
+      (y >= SCREEN_HEIGHT) ||             // Clip bottom
       ((x + 5 * size - 1) < 0) ||  // Clip left
       ((y + 8 * size - 1) < 0)     // Clip top
      )
