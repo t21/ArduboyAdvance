@@ -72,25 +72,21 @@
 #define CS_ACTIVE     digitalWriteFast(PIN_DISP_CS, LOW)
 
 // RGB LED
-#define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
-#define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
-#define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
+#define RED_LED 25   /**< The pin number for the red color in the RGB LED. */
+#define GREEN_LED 26 /**< The pin number for the greem color in the RGB LED. */
+#define BLUE_LED 28   /**< The pin number for the blue color in the RGB LED. */
 
-#define RED_LED_PORT 0 //PORTB
-#define RED_LED_BIT 0 //PORTB6
+// #define RED_LED_PORT 0 //PORTB
+// #define RED_LED_BIT 0 //PORTB6
 
-#define GREEN_LED_PORT 0 //PORTB
-#define GREEN_LED_BIT 0 //PORTB7
+// #define GREEN_LED_PORT 0 //PORTB
+// #define GREEN_LED_BIT 0 //PORTB7
 
-#define BLUE_LED_PORT 0 //PORTB
-#define BLUE_LED_BIT 0 //PORTB5
+// #define BLUE_LED_PORT 0 //PORTB
+// #define BLUE_LED_BIT 0 //PORTB5
 
 // bit values for button states
 // these are determined by the buttonsState() function
-#define LEFT_BUTTON     0b00100000  /**< The Left button value for functions requiring a bitmask */
-#define RIGHT_BUTTON    0b01000000 /**< The Right button value for functions requiring a bitmask */
-#define UP_BUTTON       0b10000000    /**< The Up button value for functions requiring a bitmask */
-#define DOWN_BUTTON     0b00010000  /**< The Down button value for functions requiring a bitmask */
 #define A_BUTTON        0b00001000     /**< The A button value for functions requiring a bitmask */
 #define B_BUTTON        0b00000100     /**< The B button value for functions requiring a bitmask */
 #define X_BUTTON        0b00000010
@@ -98,19 +94,15 @@
 #define SEL_BUTTON      0b00010000
 
 //Button pins
-//#define PIN_LEFT_BUTTON A2
-//#define PIN_RIGHT_BUTTON A1
-//#define PIN_UP_BUTTON A0
-//#define PIN_DOWN_BUTTON A3
-#define PIN_A_BUTTON 19
-#define PIN_B_BUTTON 21
-#define PIN_X_BUTTON 22
-#define PIN_Y_BUTTON 20
+#define PIN_A_BUTTON 37
+#define PIN_B_BUTTON 35
+#define PIN_X_BUTTON 38
+#define PIN_Y_BUTTON 36
 #define PIN_JOY_SEL_BUTTON 30
 
 //Joystick
-#define PIN_JOY_X_AXIS A5
-#define PIN_JOY_Y_AXIS A6
+#define PIN_JOY_X_AXIS A14
+#define PIN_JOY_Y_AXIS A15
 #define JOY_X_THRESHOLD_LOW 2000
 #define JOY_Y_THRESHOLD_LOW 2020
 #define JOY_X_THRESHOLD_HIGH 2080
@@ -119,6 +111,10 @@
 #define JOY_Y_THRESHOLD_SCALED_LOW -2
 #define JOY_X_THRESHOLD_SCALED_HIGH 0
 #define JOY_Y_THRESHOLD_SCALED_HIGH 0 //Maybe 1
+#define JOY_ANALOG_RESOLUTION 10
+
+// Backlight
+#define PIN_BACKLIGHT 29
 
 #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
 #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */

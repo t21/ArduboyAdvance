@@ -959,11 +959,13 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
   bool justReleased(uint8_t button);
 
   //Joystick
+  void pollJoystick();
+
   int joyX();
   int joyY();
 
   long scaledJoyX();
-  long scaledJoyY(); 
+  long scaledJoyY();
 
   /** \brief
    * Test if a point falls within a rectangle.
@@ -1183,6 +1185,12 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
   // For button handling
   uint8_t currentButtonState;
   uint8_t previousButtonState;
+
+    // For joystick handling
+    int16_t currentJoystickX; /**< The X coordinate of the joystick */
+    int16_t currentJoystickY; /**< The Y coordinate of the joystick */
+    int16_t previousJoystickX; /**< The X coordinate of the joystick */
+    int16_t previousJoystickY; /**< The Y coordinate of the joystick */
 
   // For frame funcions
   uint16_t eachFrameMillis;

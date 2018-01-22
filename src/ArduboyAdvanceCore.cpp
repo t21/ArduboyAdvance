@@ -6,8 +6,6 @@
 
 #include "ArduboyAdvanceCore.h"
 #include "pins_arduino.h"
-// #include "spi_dma.h"
-// #include <SPI.h>
 
 // #define USE_SPI_LIBRARY
 // #define SET_BIT(port, bitMask) digitalWrite(*(port), HIGH);
@@ -122,6 +120,9 @@ void ArduboyAdvanceCore::boot()
 
 void ArduboyAdvanceCore::gpio_init()
 {
+    // Configure backlight
+    pinMode(PIN_BACKLIGHT, OUTPUT);
+
     // Set up pins for the display
     pinMode(PIN_DISP_RD, OUTPUT);
     pinMode(PIN_DISP_WR, OUTPUT);
@@ -136,12 +137,29 @@ void ArduboyAdvanceCore::gpio_init()
 
     RD_IDLE;
 
+    // Configure dispaly reset
     pinMode(PIN_DISP_RST, OUTPUT);
     digitalWriteFast(PIN_DISP_RST, HIGH);
 
     //set up 8 bit parallel port to write mode.
     setWriteDataBus();
 
+    // Configure joystick
+    analogReadResolution(JOY_ANALOG_RESOLUTION); //For joystick
+    pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP);
+    pinMode(PIN_JOY_X_AXIS, INPUT);
+    pinMode(PIN_JOY_Y_AXIS, INPUT);
+
+    // Configure buttons
+    pinMode(PIN_A_BUTTON, INPUT_PULLUP);
+    pinMode(PIN_B_BUTTON, INPUT_PULLUP);
+    pinMode(PIN_X_BUTTON, INPUT_PULLUP);
+    pinMode(PIN_Y_BUTTON, INPUT_PULLUP);
+
+    // Configure leds
+    pinMode(RED_LED,OUTPUT);
+    pinMode(BLUE_LED,OUTPUT);
+    pinMode(GREEN_LED,OUTPUT);
     // ToDo: Add the rest of the pins
 
 }
@@ -150,101 +168,101 @@ void ArduboyAdvanceCore::gpio_init()
 
 // Pins are set to the proper modes and levels for the specific hardware.
 // This routine must be modified if any pins are moved to a different port
-void ArduboyAdvanceCore::bootPins()
-{
+// void ArduboyAdvanceCore::bootPins()
+// {
 
-#if defined(ARDUBOY_20) || defined(ARDUBOY_36)
+// #if defined(ARDUBOY_20) || defined(ARDUBOY_36)
 
-analogReadResolution(A_READ_BITS); //For joystick
+// analogReadResolution(JOY_ANALOG_RESOLUTION); //For joystick
 
-pinMode(PIN_A_BUTTON, INPUT_PULLUP);
-pinMode(PIN_B_BUTTON, INPUT_PULLUP);
-pinMode(PIN_X_BUTTON, INPUT_PULLUP);
-pinMode(PIN_Y_BUTTON, INPUT_PULLUP);
-pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP); 
-pinMode(PIN_JOY_X_AXIS, INPUT);
-pinMode(PIN_JOY_Y_AXIS, INPUT);
+// pinMode(PIN_A_BUTTON, INPUT_PULLUP);
+// pinMode(PIN_B_BUTTON, INPUT_PULLUP);
+// pinMode(PIN_X_BUTTON, INPUT_PULLUP);
+// pinMode(PIN_Y_BUTTON, INPUT_PULLUP);
+// pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP);
+// pinMode(PIN_JOY_X_AXIS, INPUT);
+// pinMode(PIN_JOY_Y_AXIS, INPUT);
 
-#elif defined(ARDUBOY_10)
+// #elif defined(ARDUBOY_10)
 
-  // Port B INPUT_PULLUP or HIGH
-  PORTB |= (1 << RED_LED_BIT) | (1 << GREEN_LED_BIT) | (1 << BLUE_LED_BIT) |
-           (1 << B_BUTTON_BIT);
-  // Port B INPUT or LOW (none)
-  // Port B inputs
-  DDRB &= ~((1 << B_BUTTON_BIT));
-  // Port B outputs
-  DDRB |= (1 << RED_LED_BIT) | (1 << GREEN_LED_BIT) | (1 << BLUE_LED_BIT) |
-          (1 << SPI_MOSI_BIT) | (1 << SPI_SCK_BIT);
+//   // Port B INPUT_PULLUP or HIGH
+//   PORTB |= (1 << RED_LED_BIT) | (1 << GREEN_LED_BIT) | (1 << BLUE_LED_BIT) |
+//            (1 << B_BUTTON_BIT);
+//   // Port B INPUT or LOW (none)
+//   // Port B inputs
+//   DDRB &= ~((1 << B_BUTTON_BIT));
+//   // Port B outputs
+//   DDRB |= (1 << RED_LED_BIT) | (1 << GREEN_LED_BIT) | (1 << BLUE_LED_BIT) |
+//           (1 << SPI_MOSI_BIT) | (1 << SPI_SCK_BIT);
 
-  // Port C
-  // Speaker: Not set here. Controlled by audio class
+//   // Port C
+//   // Speaker: Not set here. Controlled by audio class
 
-  // Port D INPUT_PULLUP or HIGH
-  PORTD |= (1 << CS_BIT);
-  // Port D INPUT or LOW
-  PORTD &= ~((1 << RST_BIT));
-  // Port D inputs (none)
-  // Port D outputs
-  DDRD |= (1 << RST_BIT) | (1 << CS_BIT) | (1 << DC_BIT);
+//   // Port D INPUT_PULLUP or HIGH
+//   PORTD |= (1 << CS_BIT);
+//   // Port D INPUT or LOW
+//   PORTD &= ~((1 << RST_BIT));
+//   // Port D inputs (none)
+//   // Port D outputs
+//   DDRD |= (1 << RST_BIT) | (1 << CS_BIT) | (1 << DC_BIT);
 
-  // Port E INPUT_PULLUP or HIGH
-  PORTE |= (1 << A_BUTTON_BIT);
-  // Port E INPUT or LOW (none)
-  // Port E inputs
-  DDRE &= ~((1 << A_BUTTON_BIT));
-  // Port E outputs (none)
+//   // Port E INPUT_PULLUP or HIGH
+//   PORTE |= (1 << A_BUTTON_BIT);
+//   // Port E INPUT or LOW (none)
+//   // Port E inputs
+//   DDRE &= ~((1 << A_BUTTON_BIT));
+//   // Port E outputs (none)
 
-  // Port F INPUT_PULLUP or HIGH
-  PORTF |= (1 << LEFT_BUTTON_BIT) | (1 << RIGHT_BUTTON_BIT) |
-           (1 << UP_BUTTON_BIT) | (1 << DOWN_BUTTON_BIT);
-  // Port F INPUT or LOW
-  PORTF &= ~((1 << RAND_SEED_IN_BIT));
-  // Port F inputs
-  DDRF &= ~((1 << LEFT_BUTTON_BIT) | (1 << RIGHT_BUTTON_BIT) |
-            (1 << UP_BUTTON_BIT) | (1 << DOWN_BUTTON_BIT) |
-            (1 << RAND_SEED_IN_BIT));
-  // Port F outputs (none)
+//   // Port F INPUT_PULLUP or HIGH
+//   PORTF |= (1 << LEFT_BUTTON_BIT) | (1 << RIGHT_BUTTON_BIT) |
+//            (1 << UP_BUTTON_BIT) | (1 << DOWN_BUTTON_BIT);
+//   // Port F INPUT or LOW
+//   PORTF &= ~((1 << RAND_SEED_IN_BIT));
+//   // Port F inputs
+//   DDRF &= ~((1 << LEFT_BUTTON_BIT) | (1 << RIGHT_BUTTON_BIT) |
+//             (1 << UP_BUTTON_BIT) | (1 << DOWN_BUTTON_BIT) |
+//             (1 << RAND_SEED_IN_BIT));
+//   // Port F outputs (none)
 
-#elif defined(AB_DEVKIT)
+// #elif defined(AB_DEVKIT)
 
-  // Port B INPUT_PULLUP or HIGH
-  PORTB |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) |
-           _BV(BLUE_LED_BIT);
-  // Port B INPUT or LOW (none)
-  // Port B inputs
-  DDRB &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT));
-  // Port B outputs
-  DDRB |= _BV(BLUE_LED_BIT) | _BV(SPI_MOSI_BIT) | _BV(SPI_SCK_BIT);
+//   // Port B INPUT_PULLUP or HIGH
+//   PORTB |= _BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT) |
+//            _BV(BLUE_LED_BIT);
+//   // Port B INPUT or LOW (none)
+//   // Port B inputs
+//   DDRB &= ~(_BV(LEFT_BUTTON_BIT) | _BV(UP_BUTTON_BIT) | _BV(DOWN_BUTTON_BIT));
+//   // Port B outputs
+//   DDRB |= _BV(BLUE_LED_BIT) | _BV(SPI_MOSI_BIT) | _BV(SPI_SCK_BIT);
 
-  // Port C INPUT_PULLUP or HIGH
-  PORTC |= _BV(RIGHT_BUTTON_BIT);
-  // Port C INPUT or LOW (none)
-  // Port C inputs
-  DDRC &= ~(_BV(RIGHT_BUTTON_BIT));
-  // Port C outputs (none)
+//   // Port C INPUT_PULLUP or HIGH
+//   PORTC |= _BV(RIGHT_BUTTON_BIT);
+//   // Port C INPUT or LOW (none)
+//   // Port C inputs
+//   DDRC &= ~(_BV(RIGHT_BUTTON_BIT));
+//   // Port C outputs (none)
 
-  // Port D INPUT_PULLUP or HIGH
-  PORTD |= _BV(CS_BIT);
-  // Port D INPUT or LOW
-  PORTD &= ~(_BV(RST_BIT));
-  // Port D inputs (none)
-  // Port D outputs
-  DDRD |= _BV(RST_BIT) | _BV(CS_BIT) | _BV(DC_BIT);
+//   // Port D INPUT_PULLUP or HIGH
+//   PORTD |= _BV(CS_BIT);
+//   // Port D INPUT or LOW
+//   PORTD &= ~(_BV(RST_BIT));
+//   // Port D inputs (none)
+//   // Port D outputs
+//   DDRD |= _BV(RST_BIT) | _BV(CS_BIT) | _BV(DC_BIT);
 
-  // Port E (none)
+//   // Port E (none)
 
-  // Port F INPUT_PULLUP or HIGH
-  PORTF |= _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
-  // Port F INPUT or LOW
-  PORTF &= ~(_BV(RAND_SEED_IN_BIT));
-  // Port F inputs
-  DDRF &= ~(_BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT) | _BV(RAND_SEED_IN_BIT));
-  // Port F outputs (none)
-  // Speaker: Not set here. Controlled by audio class
+//   // Port F INPUT_PULLUP or HIGH
+//   PORTF |= _BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT);
+//   // Port F INPUT or LOW
+//   PORTF &= ~(_BV(RAND_SEED_IN_BIT));
+//   // Port F inputs
+//   DDRF &= ~(_BV(A_BUTTON_BIT) | _BV(B_BUTTON_BIT) | _BV(RAND_SEED_IN_BIT));
+//   // Port F outputs (none)
+//   // Speaker: Not set here. Controlled by audio class
 
-#endif
-}
+// #endif
+// }
 
 
 void ArduboyAdvanceCore::ili9341_init(void)
@@ -370,59 +388,62 @@ void ArduboyAdvanceCore::ili9341_init(void)
     writecommand(ILI9341_SLPOUT);    //Exit Sleep
     delay(120);
     writecommand(ILI9341_DISPON);    //Display on
+
+    // Set backlight level
+    analogWrite(PIN_BACKLIGHT, 255);
 }
 
 
-void ArduboyAdvanceCore::setRotation(uint8_t x) {
+// void ArduboyAdvanceCore::setRotation(uint8_t x) {
 
-  // Call parent rotation func first -- sets up rotation flags, etc.
-//   Adafruit_GFX::setRotation(x);
+//   // Call parent rotation func first -- sets up rotation flags, etc.
+// //   Adafruit_GFX::setRotation(x);
 
-    uint8_t rotation = (x & 3);
+//     uint8_t rotation = (x & 3);
 
-    switch(rotation) {
-        case 0:
-        case 2:
-            // _width  = SCREEN_WIDTH;
-            // _height = SCREEN_HEIGHT;
-            break;
-        case 1:
-        case 3:
-            // _width  = SCREEN_HEIGHT;
-            // _height = SCREEN_WIDTH;
-            break;
-        default:
-            break;
-    }
+//     switch(rotation) {
+//         case 0:
+//         case 2:
+//             // _width  = SCREEN_WIDTH;
+//             // _height = SCREEN_HEIGHT;
+//             break;
+//         case 1:
+//         case 3:
+//             // _width  = SCREEN_HEIGHT;
+//             // _height = SCREEN_WIDTH;
+//             break;
+//         default:
+//             break;
+//     }
 
-  // Then perform hardware-specific rotation operations...
+//   // Then perform hardware-specific rotation operations...
 
-    CS_ACTIVE;
+//     CS_ACTIVE;
 
-    uint16_t t = 0;
+//     uint16_t t = 0;
 
-    switch (rotation) {
-        case 2:
-            t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
-            break;
-        case 3:
-            t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
-            break;
-        case 0:
-            t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
-            break;
-        case 1:
-            t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
-            break;
-        default:
-            break;
-    }
+//     switch (rotation) {
+//         case 2:
+//             t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
+//             break;
+//         case 3:
+//             t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+//             break;
+//         case 0:
+//             t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
+//             break;
+//         case 1:
+//             t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+//             break;
+//         default:
+//             break;
+//     }
 
-    writecommand(ILI9341_MADCTL);
-    writedata(t);
-    // For 9341, init default full-screen address window:
-    // setAddrWindow(0, 0, _width - 1, _height - 1); // CS_IDLE happens here
-}
+//     writecommand(ILI9341_MADCTL);
+//     writedata(t);
+//     // For 9341, init default full-screen address window:
+//     // setAddrWindow(0, 0, _width - 1, _height - 1); // CS_IDLE happens here
+// }
 
 // void ArduboyAdvanceCore::bootOLED()
 // {
@@ -756,7 +777,7 @@ void ArduboyAdvanceCore::setReadDataBus(void) {
 
 void ArduboyAdvanceCore::safeMode()
 {
-  if (buttonsState() == UP_BUTTON)
+  if (buttonsState() == Y_BUTTON)
   {
     digitalWriteRGB(RED_LED, RGB_ON);
 
@@ -1085,80 +1106,54 @@ void ArduboyAdvanceCore::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 
 void ArduboyAdvanceCore::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
-#ifdef ARDUBOY_10
-  bitWrite(RED_LED_PORT, RED_LED_BIT, red);
-  bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, green);
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit
-  (void)red;    // parameter unused
-  (void)green;  // parameter unused
-  bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, blue);
-#endif
+    digitalWriteFast(BLUE_LED,blue);
+    digitalWriteFast(GREEN_LED,green);
+    digitalWriteFast(RED_LED,red);
 }
 
 void ArduboyAdvanceCore::digitalWriteRGB(uint8_t color, uint8_t val)
 {
-#ifdef ARDUBOY_10
-  if (color == RED_LED)
-  {
-    bitWrite(RED_LED_PORT, RED_LED_BIT, val);
-  }
-  else if (color == GREEN_LED)
-  {
-    bitWrite(GREEN_LED_PORT, GREEN_LED_BIT, val);
-  }
-  else if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
-  }
-#elif defined(AB_DEVKIT)
-  // only blue on DevKit
-  if (color == BLUE_LED)
-  {
-    bitWrite(BLUE_LED_PORT, BLUE_LED_BIT, val);
-  }
-#endif
+    digitalWriteFast(color, val);
 }
 
 /* Buttons */
 
 uint8_t ArduboyAdvanceCore::buttonsState()
 {
-  uint8_t buttons;
-#if defined(ARDUBOY_20) || defined(ARDUBOY_36)
-  uint8_t Abit;
-  uint8_t Bbit;
-  uint8_t Xbit;
-  uint8_t Ybit;
-  uint8_t Selbit;
+    uint8_t buttons;
+// #if defined(ARDUBOY_20) || defined(ARDUBOY_36)
+    uint8_t Abit;
+    uint8_t Bbit;
+    uint8_t Xbit;
+    uint8_t Ybit;
+    uint8_t Selbit;
 
-  Abit = ~digitalRead(PIN_A_BUTTON) & 0x01;
-  Bbit = ~digitalRead(PIN_B_BUTTON) & 0x01;
-  Xbit = ~digitalRead(PIN_X_BUTTON) & 0x01;
-  Ybit = ~digitalRead(PIN_Y_BUTTON) & 0x01;
-  Selbit = ~digitalRead(PIN_JOY_SEL_BUTTON) & 0x01;
+    Abit   = ~digitalReadFast(PIN_A_BUTTON) & 0x01;
+    Bbit   = ~digitalReadFast(PIN_B_BUTTON) & 0x01;
+    Xbit   = ~digitalReadFast(PIN_X_BUTTON) & 0x01;
+    Ybit   = ~digitalReadFast(PIN_Y_BUTTON) & 0x01;
+    Selbit = ~digitalReadFast(PIN_JOY_SEL_BUTTON) & 0x01;
 
-  buttons = (Selbit << 4) | (Abit << 3) | (Bbit << 2) | (Xbit << 1) | (Ybit);
+    buttons = (Selbit << 4) | (Abit << 3) | (Bbit << 2) | (Xbit << 1) | (Ybit);
 
-  // using ports here is ~100 bytes smaller than digitalRead()
-#elif defined(AB_DEVKIT)
-  // down, left, up
-  buttons = ((~PINB) & B01110000);
-  // right button
-  buttons = buttons | (((~PINC) & B01000000) >> 4);
-  // A and B
-  buttons = buttons | (((~PINF) & B11000000) >> 6);
-#elif defined(ARDUBOY_10)
-  // down, up, left right
-  buttons = ((~PINF) & B11110000);
-  // A (left)
-  buttons = buttons | (((~PINE) & B01000000) >> 3);
-  // B (right)
-  buttons = buttons | (((~PINB) & B00010000) >> 2);
-#endif
+//   // using ports here is ~100 bytes smaller than digitalRead()
+// #elif defined(AB_DEVKIT)
+//   // down, left, up
+//   buttons = ((~PINB) & B01110000);
+//   // right button
+//   buttons = buttons | (((~PINC) & B01000000) >> 4);
+//   // A and B
+//   buttons = buttons | (((~PINF) & B11000000) >> 6);
+// #elif defined(ARDUBOY_10)
+//   // down, up, left right
+//   buttons = ((~PINF) & B11110000);
+//   // A (left)
+//   buttons = buttons | (((~PINE) & B01000000) >> 3);
+//   // B (right)
+//   buttons = buttons | (((~PINB) & B00010000) >> 2);
+// #endif
 
-  return buttons;
+    return buttons;
 }
 
 // delay in ms with 16 bit duration
@@ -1169,58 +1164,6 @@ void ArduboyAdvanceCore::delayShort(uint16_t ms)
 
 
 ////////// stuff not actively being used, but kept for posterity
-
-
-// uint8_t ArduboyAdvanceCore::spiread(void) {
-//   uint8_t r = 0;
-
-//   if (hwSPI) {
-// #ifdef __AVR__
-//     SPDR = 0x00;
-//     while(!(SPSR & _BV(SPIF)));
-//     r = SPDR;
-// #endif
-// #if defined(USE_SPI_LIBRARY)
-//     r = SPI.transfer(0x00);
-// #endif
-//   } else {
-
-//     for (uint8_t i=0; i<8; i++) {
-//       digitalWrite(_sclk, LOW);
-//       digitalWrite(_sclk, HIGH);
-//       r <<= 1;
-//       if (digitalRead(_miso))
-// 	r |= 0x1;
-//     }
-//   }
-//   //Serial.print("read: 0x"); Serial.print(r, HEX);
-
-//   return r;
-// }
-
-//  uint8_t ArduboyAdvanceCore::readdata(void) {
-//    digitalWrite(_dc, HIGH);
-//    digitalWrite(_cs, LOW);
-//    uint8_t r = SPI.transfer(0x00);
-//    digitalWrite(_cs, HIGH);
-
-//    return r;
-// }
-
-
-// uint8_t ArduboyAdvanceCore::readcommand8(uint8_t c) {
-//    digitalWrite(PIN_DC, LOW);
-//    digitalWrite(PIN_SCK, LOW);
-//    digitalWrite(PIN_CS, LOW);
-//   //  spiwrite(c);
-//    SPI.transfer(c);
-
-
-//    digitalWrite(PIN_DC, HIGH);
-//    uint8_t r = SPI.transfer(0x00);
-//    digitalWrite(PIN_CS, HIGH);
-//    return r;
-// }
 
 
 uint8_t ArduboyAdvanceCore::read8(void)

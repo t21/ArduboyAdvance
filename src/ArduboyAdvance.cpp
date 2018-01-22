@@ -59,7 +59,7 @@ void ArduboyAdvanceBase::begin()
 
 void ArduboyAdvanceBase::flashlight()
 {
-  if (!pressed(UP_BUTTON)) {
+  if (!pressed(Y_BUTTON)) {
     return;
   }
 
@@ -78,10 +78,10 @@ void ArduboyAdvanceBase::flashlight()
 
 void ArduboyAdvanceBase::systemButtons()
 {
-  while (pressed(B_BUTTON)) {
+  while (pressed(SEL_BUTTON)) {
     digitalWriteRGB(BLUE_LED, RGB_ON); // turn on blue LED
-    sysCtrlSound(UP_BUTTON + B_BUTTON, GREEN_LED, 0xff);
-    sysCtrlSound(DOWN_BUTTON + B_BUTTON, RED_LED, 0);
+    sysCtrlSound(Y_BUTTON + SEL_BUTTON, GREEN_LED, 0xff);
+    sysCtrlSound(A_BUTTON + SEL_BUTTON, RED_LED, 0);
     delayShort(200);
   }
 
@@ -149,7 +149,7 @@ void ArduboyAdvanceBase::bootLogoShell(void (*drawLogo)(int16_t))
     digitalWriteRGB(RED_LED, RGB_ON);
 
     for (int16_t y = -18; y <= 24; y++) {
-        if (pressed(RIGHT_BUTTON)) {
+        if (pressed(X_BUTTON)) {
             digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
             return;
         }
@@ -860,62 +860,71 @@ uint8_t* ArduboyAdvanceBase::getBuffer()
 
 bool ArduboyAdvanceBase::pressed(uint8_t buttons)
 {
-  return (buttonsState() & buttons) == buttons;
+    return (buttonsState() & buttons) == buttons;
 }
 
 bool ArduboyAdvanceBase::notPressed(uint8_t buttons)
 {
-  return (buttonsState() & buttons) == 0;
+    return (buttonsState() & buttons) == 0;
 }
 
 void ArduboyAdvanceBase::pollButtons()
 {
-  previousButtonState = currentButtonState;
-  currentButtonState = buttonsState();
+    previousButtonState = currentButtonState;
+    currentButtonState = buttonsState();
 }
 
 bool ArduboyAdvanceBase::justPressed(uint8_t button)
 {
-  return (!(previousButtonState & button) && (currentButtonState & button));
+    return (!(previousButtonState & button) && (currentButtonState & button));
 }
 
 bool ArduboyAdvanceBase::justReleased(uint8_t button)
 {
-  return ((previousButtonState & button) && !(currentButtonState & button));
+    return ((previousButtonState & button) && !(currentButtonState & button));
+}
+
+void ArduboyAdvanceBase::pollJoystick()
+{
+    previousJoystickX = currentJoystickX;
+    previousJoystickY = currentJoystickY;
+    currentJoystickX  = joyX();
+    currentJoystickY  = joyY();
 }
 
 int ArduboyAdvanceBase::joyX() {
   int val = analogRead(PIN_JOY_X_AXIS);
-  if (val > JOY_X_THRESHOLD_HIGH || val < JOY_X_THRESHOLD_LOW) 
+  if (val > JOY_X_THRESHOLD_HIGH || val < JOY_X_THRESHOLD_LOW)
     return val;
-  else 
+  else
     return 0;
 }
 
 int ArduboyAdvanceBase::joyY() {
   int val = analogRead(PIN_JOY_Y_AXIS);
-  if (val > JOY_Y_THRESHOLD_HIGH || val < JOY_Y_THRESHOLD_LOW) 
+  if (val > JOY_Y_THRESHOLD_HIGH || val < JOY_Y_THRESHOLD_LOW)
     return val;
-  else 
+  else
     return 0;
 }
 
 long ArduboyAdvanceBase::scaledJoyX() {
   long val = analogRead(PIN_JOY_X_AXIS);
-  val = map(val,0,pow(2,A_READ_BITS),-100,100); 
-  if (val > JOY_X_THRESHOLD_SCALED_HIGH || val < JOY_X_THRESHOLD_SCALED_LOW) 
-    return val; 
-  else
-    return 0;
+//   val = map(val, 0, pow(2, JOY_ANALOG_RESOLUTION), -10, 10);
+  val = map(val, pow(2, JOY_ANALOG_RESOLUTION), 0, -10, 10);
+//   if (val > JOY_X_THRESHOLD_SCALED_HIGH || val < JOY_X_THRESHOLD_SCALED_LOW)
+    return val;
+//   else
+//     return 0;
 }
 
 long ArduboyAdvanceBase::scaledJoyY() {
   long val = analogRead(PIN_JOY_Y_AXIS);
-  val = map(val,0,pow(2,A_READ_BITS),-100,100);
-  if (val > JOY_Y_THRESHOLD_SCALED_HIGH || val < JOY_Y_THRESHOLD_SCALED_LOW) 
+  val = map(val, pow(2, JOY_ANALOG_RESOLUTION), 0, -10, 10);
+//   if (val > JOY_Y_THRESHOLD_SCALED_HIGH || val < JOY_Y_THRESHOLD_SCALED_LOW)
     return val;
-  else 
-    return 0;
+//   else
+    // return 0;
 }
 
 bool ArduboyAdvanceBase::collide(Point point, Rect rect)
@@ -1024,7 +1033,7 @@ void ArduboyAdvance::bootLogoText()
     textSize = 2;
 
     for (int8_t y = -18; y <= 24; y++) {
-        if (pressed(RIGHT_BUTTON)) {
+        if (pressed(X_BUTTON)) {
             digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
             textSize = 1;
         return;
