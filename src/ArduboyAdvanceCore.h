@@ -37,8 +37,8 @@
 // #define AB_DEVKIT    //< compile for the official dev kit
 #endif
 
-#define RGB_ON LOW   /**< For digitially setting an RGB LED on using digitalWriteRGB() */
-#define RGB_OFF HIGH /**< For digitially setting an RGB LED off using digitalWriteRGB() */
+#define RGB_ON HIGH   /**< For digitially setting an RGB LED on using digitalWriteRGB() */
+#define RGB_OFF LOW /**< For digitially setting an RGB LED off using digitalWriteRGB() */
 
 // ----- Arduboy 3.6 pins -----
 #if defined(ARDUBOY_36)

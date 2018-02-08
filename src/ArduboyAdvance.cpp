@@ -238,11 +238,9 @@ bool ArduboyAdvanceBase::nextFrameDEV()
 
   if (ret) {
     if (lastFrameDurationMs > eachFrameMillis)
-      // TXLED1;
-      ;
+        digitalWriteRGB(RED_LED, RGB_ON);    // red LED on
     else
-      // TXLED0;
-      ;
+        digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
   }
   return ret;
 }
