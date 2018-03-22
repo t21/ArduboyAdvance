@@ -44,12 +44,13 @@ void ArduboyAdvanceBase::begin()
 
   // audio.begin();
 
-    bootLogo();
-    // alternative logo functions. Work the same a bootLogo() but may reduce
-    // memory size if the sketch uses the same bitmap drawing function
-    // bootLogoCompressed();
-    // bootLogoSpritesSelfMasked();
-    // bootLogoSpritesOverwrite();
+  bootLogo();
+  // alternative logo functions. Work the same a bootLogo() but may reduce
+  // memory size if the sketch uses the same bitmap drawing function
+//  bootLogoCompressed();
+//  bootLogoSpritesSelfMasked();
+//  bootLogoSpritesOverwrite();
+
 
     // wait for all buttons to be released
     // do {
@@ -104,12 +105,22 @@ void ArduboyAdvanceBase::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVa
 
 void ArduboyAdvanceBase::bootLogo()
 {
-    bootLogoShell(drawLogoBitmap);
+
+  //bootLogoShell(drawLogoBitmap);
+  drawBitmap(10,10,arduboy_a,40,40);
+  drawBitmap(60,10,arduboy_r,40,40);
+  drawBitmap(110,10,arduboy_d,40,40);
+  drawBitmap(160,10,arduboy_u,40,40);
+  drawBitmap(210,10,arduboy_b,40,40);
+  drawBitmap(260,10,arduboy_o,40,40);
+  drawBitmap(310,10,arduboy_y,40,40);
+
+  delayShort(2000);
 }
 
 void ArduboyAdvanceBase::drawLogoBitmap(int16_t y)
 {
-    drawBitmap(20, y, arduboy_advance_logo, 88, 16);
+  //drawBitmap(20, y, arduboy_logo, 88, 16);
 }
 
 void ArduboyAdvanceBase::bootLogoCompressed()
@@ -665,8 +676,10 @@ void ArduboyAdvanceBase::fillTriangle(int16_t x0, int16_t y0, int16_t x1,
     }
 }
 
+
 void ArduboyAdvanceBase::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
         uint16_t w, uint16_t h, uint16_t color)
+
 {
     // no need to draw at all if we're offscreen
     if ((x + w) < 0 || x > (SCREEN_WIDTH - 1) || (y + h) < 0 || y > (SCREEN_HEIGHT - 1)) {
@@ -686,10 +699,26 @@ void ArduboyAdvanceBase::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
             }
         }
     }
+  }
+}*/
 
-    return;
+void ArduboyAdvanceBase::drawBitmap(int16_t x, int16_t y, const uint16_t *bitmap ,uint16_t width, uint16_t height, uint16_t color) { //Bitmap might be uint32_t //ToDo: Delete color
+  /*if (x - width > width*2 || x + width < width*2 || y - height > height*2 || y + height < height*2) 
+    return;*/
+    
+  uint16_t drawPos;
+  uint16_t readPos;
+  
+  for (uint16_t i = 0; i < height; i++) {
+    for (uint16_t j = 0; j < width; j++) {
+      drawPos = (x+j) + ((y+i)*WIDTH); //WIDTH = SCREENWIDTH
+      //readPos = *bitmap + (x+j) + ((y+i)*width); //PROGMEM
+      //sBuffer[drawPos] = pgm_read_byte(readPos); //PROGMEM
+      readPos = j + i*width; //SRAM
+      sBuffer[drawPos] = bitmap[readPos]; //SRAM
+    }
+  }
 }
-
 
 void ArduboyAdvanceBase::drawSlowXYBitmap
 (int16_t x, int16_t y, const uint8_t *bitmap, uint8_t w, uint8_t h, uint16_t color)

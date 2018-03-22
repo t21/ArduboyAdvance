@@ -620,8 +620,9 @@ class ArduboyAdvanceBase : public ArduboyAdvanceCore
    *
    * The array must be located in program memory by using the PROGMEM modifier.
    */
-  static void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
-      uint16_t w, uint16_t h, uint16_t color = WHITE);
+
+  static void drawBitmap(int16_t x, int16_t y, const uint16_t *bitmap, uint16_t width, uint16_t height, uint16_t color = WHITE);
+
 
   /** \brief
    * Draw a bitmap from a horizontally oriented array in program memory.
