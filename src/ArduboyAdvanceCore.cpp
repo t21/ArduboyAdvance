@@ -137,16 +137,16 @@ void ArduboyAdvanceCore::gpio_init()
 
     RD_IDLE;
 
-    // Configure dispaly reset
+    // Configure display reset
     pinMode(PIN_DISP_RST, OUTPUT);
-    digitalWriteFast(PIN_DISP_RST, HIGH);
+    digitalWrite(PIN_DISP_RST, HIGH);
 
     //set up 8 bit parallel port to write mode.
     setWriteDataBus();
 
     // Configure joystick
     analogReadResolution(JOY_ANALOG_RESOLUTION); //For joystick
-    pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP);
+    // pinMode(PIN_JOY_SEL_BUTTON, INPUT_PULLUP);
     pinMode(PIN_JOY_X_AXIS, INPUT);
     pinMode(PIN_JOY_Y_AXIS, INPUT);
 
@@ -157,9 +157,9 @@ void ArduboyAdvanceCore::gpio_init()
     pinMode(PIN_Y_BUTTON, INPUT_PULLUP);
 
     // Configure leds
-    pinMode(RED_LED,OUTPUT);
-    pinMode(BLUE_LED,OUTPUT);
-    pinMode(GREEN_LED,OUTPUT);
+    // pinMode(RED_LED,OUTPUT);
+    // pinMode(BLUE_LED,OUTPUT);
+    // pinMode(GREEN_LED,OUTPUT);
     // ToDo: Add the rest of the pins
 
 }
@@ -779,7 +779,7 @@ void ArduboyAdvanceCore::safeMode()
 {
   if (buttonsState() == Y_BUTTON)
   {
-    digitalWriteRGB(RED_LED, RGB_ON);
+    // digitalWriteRGB(RED_LED, RGB_ON);
 
     // prevent the bootloader magic number from being overwritten by timer 0
     // when a timer variable overlaps the magic number location
@@ -908,22 +908,63 @@ void ArduboyAdvanceCore::paint8Pixels(uint8_t pixels)
 
 // paint from a memory buffer, this should be FAST as it's likely what
 // will be used by any buffer based subclass
-void ArduboyAdvanceCore::paintScreen(uint8_t image[], bool clear)
+volatile void ArduboyAdvanceCore::paintScreen(uint8_t image[], bool clear)
 {
+    uint32_t port_in;
+    uint32_t i = 0;
+
     setAddrWindow(0, 0, SCREEN_WIDTH - 1, SCREEN_HEIGHT - 1);
 
     CD_DATA;
 
-    for (uint32_t i = 0; i < SCREEN_BUF_SIZE; i += 2) {
-        write8(image[i]);
-        write8(image[i + 1]);
-        if (clear) {
-            image[i] = 0x00;
-            image[i + 1] = 0x00;
-        }
+    port_in = DISP_PORT_IN & 0xFF00FFFF;
+    port_in &= ~0x5000;
+
+    // for (uint32_t i = 0; i < SCREEN_BUF_SIZE; i += 2) {
+    while (i < SCREEN_BUF_SIZE) {
+        // write8(image[i]);
+        CS_WR_ACTIVE;
+        // DISP_PORT_OUT = (DISP_PORT_IN & 0xFF00FFFF) | (image[i++] << 16);
+        DISP_PORT_OUT = port_in | (image[i++] << 16);
+        // WR_IDLE;
+        // CS_IDLE;
+        CS_WR_IDLE;
+
+        // write8(image[i + 1]);
+        CS_WR_ACTIVE;
+        // DISP_PORT_OUT = (DISP_PORT_IN & 0xFF00FFFF) | (image[i++] << 16);
+        DISP_PORT_OUT = port_in | (image[i++] << 16);
+        // WR_IDLE;
+        // CS_IDLE;
+        CS_WR_IDLE;
+
+        // if (clear) {
+        //     image[i] = 0x00;
+        //     image[i + 1] = 0x00;
+        // }
     }
 
-    CS_IDLE;
+    // CS_WR_ACTIVE;
+
+    // // uint32_t data = DISP_PORT_IN;
+    // // data &= 0xFF00FFFF;
+    // // data |= (c << 16);
+    // // DISP_PORT_OUT = data;
+    // DISP_PORT_OUT = (DISP_PORT_IN & 0xFF00FFFF) | (c << 16);
+
+    // WR_IDLE;
+    // asm volatile("NOP");
+    // asm volatile("NOP");
+    // asm volatile("NOP");
+    // CS_IDLE;
+
+
+    // CS_IDLE;
+
+    if (clear) {
+        memset(image, 0, SCREEN_BUF_SIZE);
+    }
+
 
     return;
 
@@ -1053,17 +1094,24 @@ void ArduboyAdvanceCore::flipHorizontal(bool flipped)
 
 void ArduboyAdvanceCore::write8(uint8_t c)
 {
-    CS_ACTIVE;
+#if 1
+    // CS_ACTIVE;
 
-    // digitalWriteFast(TFT_WR, LOW);
-    WR_ACTIVE;
-    *((volatile uint8_t *)(&GPIOC_PDOR)) = c;
-    // digitalWriteFast(TFT_WR, HIGH);
+    // WR_ACTIVE;
+    CS_WR_ACTIVE;
+    // *((volatile uint8_t *)(&GPIOC_PDOR)) = c;
+    // ToDo: Fix new write
+    uint32_t port_data = c << 16;
+    // uint32_t port_data_set = (c << 16) & 0x00FF0000;
+    // uint32_t port_data_clr = ~(c << 16) & 0x00FF0000;
+    // DISP_PORT_SET = port_data & 0x00FF0000;
+    DISP_PORT_SET = port_data;
+    DISP_PORT_CLR = ~port_data & 0x00FF0000;
     WR_IDLE;
-    asm volatile("NOP"); // wait ten ns
-    asm volatile("NOP");
-    asm volatile("NOP");
-    asm volatile("NOP");
+    // asm volatile("NOP"); // wait ten ns
+    // asm volatile("NOP");
+    // asm volatile("NOP");
+    // asm volatile("NOP");
 
     // asm volatile("NOP");
     // asm volatile("NOP");
@@ -1071,6 +1119,21 @@ void ArduboyAdvanceCore::write8(uint8_t c)
     // asm volatile("NOP");
 
     CS_IDLE;
+#else
+    CS_WR_ACTIVE;
+
+    // uint32_t data = DISP_PORT_IN;
+    // data &= 0xFF00FFFF;
+    // data |= (c << 16);
+    // DISP_PORT_OUT = data;
+    DISP_PORT_OUT = (DISP_PORT_IN & 0xFF00FFFF) | (c << 16);
+
+    WR_IDLE;
+    asm volatile("NOP");
+    asm volatile("NOP");
+    asm volatile("NOP");
+    CS_IDLE;
+#endif
 }
 
 
@@ -1106,14 +1169,14 @@ void ArduboyAdvanceCore::setRGBled(uint8_t red, uint8_t green, uint8_t blue)
 
 void ArduboyAdvanceCore::digitalWriteRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
-    digitalWriteFast(BLUE_LED,blue);
-    digitalWriteFast(GREEN_LED,green);
-    digitalWriteFast(RED_LED,red);
+    // digitalWrite(BLUE_LED,blue);
+    // digitalWrite(GREEN_LED,green);
+    // digitalWrite(RED_LED,red);
 }
 
 void ArduboyAdvanceCore::digitalWriteRGB(uint8_t color, uint8_t val)
 {
-    digitalWriteFast(color, val);
+    // digitalWrite(color, val);
 }
 
 /* Buttons */
@@ -1126,15 +1189,15 @@ uint8_t ArduboyAdvanceCore::buttonsState()
     uint8_t Bbit;
     uint8_t Xbit;
     uint8_t Ybit;
-    uint8_t Selbit;
+    // uint8_t Selbit;
 
-    Abit   = ~digitalReadFast(PIN_A_BUTTON) & 0x01;
-    Bbit   = ~digitalReadFast(PIN_B_BUTTON) & 0x01;
-    Xbit   = ~digitalReadFast(PIN_X_BUTTON) & 0x01;
-    Ybit   = ~digitalReadFast(PIN_Y_BUTTON) & 0x01;
-    Selbit = ~digitalReadFast(PIN_JOY_SEL_BUTTON) & 0x01;
+    Abit   = ~digitalRead(PIN_A_BUTTON) & 0x01;
+    Bbit   = ~digitalRead(PIN_B_BUTTON) & 0x01;
+    Xbit   = ~digitalRead(PIN_X_BUTTON) & 0x01;
+    Ybit   = ~digitalRead(PIN_Y_BUTTON) & 0x01;
+    // Selbit = ~digitalRead(PIN_JOY_SEL_BUTTON) & 0x01;
 
-    buttons = (Selbit << 4) | (Abit << 3) | (Bbit << 2) | (Xbit << 1) | (Ybit);
+    buttons = (Abit << 3) | (Bbit << 2) | (Xbit << 1) | (Ybit);
 
 //   // using ports here is ~100 bytes smaller than digitalRead()
 // #elif defined(AB_DEVKIT)
@@ -1171,14 +1234,14 @@ uint8_t ArduboyAdvanceCore::read8(void)
     RD_ACTIVE;
     delay(5);
     uint8_t temp = 0;
-    if(digitalReadFast(PIN_DISP_D0)) {temp |= (1 << 0);} // slow reading but works
-    if(digitalReadFast(PIN_DISP_D1)) {temp |= (1 << 1);}
-    if(digitalReadFast(PIN_DISP_D2)) {temp |= (1 << 2);}
-    if(digitalReadFast(PIN_DISP_D3)) {temp |= (1 << 3);}
-    if(digitalReadFast(PIN_DISP_D4)) {temp |= (1 << 4);}
-    if(digitalReadFast(PIN_DISP_D5)) {temp |= (1 << 5);}
-    if(digitalReadFast(PIN_DISP_D6)) {temp |= (1 << 6);}
-    if(digitalReadFast(PIN_DISP_D7)) {temp |= (1 << 7);}
+    if(digitalRead(PIN_DISP_D0)) {temp |= (1 << 0);} // slow reading but works
+    if(digitalRead(PIN_DISP_D1)) {temp |= (1 << 1);}
+    if(digitalRead(PIN_DISP_D2)) {temp |= (1 << 2);}
+    if(digitalRead(PIN_DISP_D3)) {temp |= (1 << 3);}
+    if(digitalRead(PIN_DISP_D4)) {temp |= (1 << 4);}
+    if(digitalRead(PIN_DISP_D5)) {temp |= (1 << 5);}
+    if(digitalRead(PIN_DISP_D6)) {temp |= (1 << 6);}
+    if(digitalRead(PIN_DISP_D7)) {temp |= (1 << 7);}
     RD_IDLE;
     delay(5);
     return temp;

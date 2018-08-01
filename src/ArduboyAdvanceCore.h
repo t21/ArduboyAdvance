@@ -32,9 +32,10 @@
  *     // #define ARDUBOY_10
  *     #define AB_DEVKIT
  */
-#define ARDUBOY_36   //< compile for the production Arduboy v2.0
+// #define ARDUBOY_36   //< compile for the production Arduboy v2.0
 //#define ARDUBOY_10   //< compile for the production Arduboy v1.0
 // #define AB_DEVKIT    //< compile for the official dev kit
+#define ARDUBOY_20   //< compile for the Arduboy Advance v2.0
 #endif
 
 #define RGB_ON HIGH   /**< For digitially setting an RGB LED on using digitalWriteRGB() */
@@ -62,7 +63,7 @@
 #define DISP_PORT       GPIOC_PSOR
 
 // Macros for setting the display control signals
-#define RD_IDLE  	  digitalWriteFast(PIN_DISP_RD, HIGH)
+#define RD_IDLE  	    digitalWriteFast(PIN_DISP_RD, HIGH)
 #define RD_ACTIVE     digitalWriteFast(PIN_DISP_RD, LOW)
 #define WR_IDLE       digitalWriteFast(PIN_DISP_WR, HIGH)
 #define WR_ACTIVE     digitalWriteFast(PIN_DISP_WR, LOW)
@@ -136,83 +137,104 @@
 // ----- Arduboy 2.0 pins -----
 #elif defined(ARDUBOY_20)
 
-#define PIN_CS A1       // Display CS Arduino pin number
-// #define CS_PORT 0 //PORTD   // Display CS port
-// #define CS_BIT 0 //PORTD6   // Display CS physical bit number
+    // Display control signals
+    #define PIN_DISP_CS     20
+    #define PIN_DISP_CD     A5
+    #define PIN_DISP_WR     4
+    #define PIN_DISP_RD     21
+    #define PIN_DISP_RST    A2
 
-#define PIN_DC 7        // Display D/C Arduino pin number
-// #define DC_PORT 0 //PORTD   // Display D/C port
-// #define DC_BIT 0 //PORTD4   // Display D/C physical bit number
+    // Display data signals
+    #define PIN_DISP_D0     5
+    #define PIN_DISP_D1     24
+    #define PIN_DISP_D2     6
+    #define PIN_DISP_D3     9
+    #define PIN_DISP_D4     10
+    #define PIN_DISP_D5     11
+    #define PIN_DISP_D6     12
+    #define PIN_DISP_D7     13
+    #define DISP_PORT_SET   REG_PORT_OUTSET0
+    #define DISP_PORT_CLR   REG_PORT_OUTCLR0
+    #define DISP_PORT_OUT   REG_PORT_OUT0
+    #define DISP_PORT_IN    REG_PORT_IN0
 
-#define PIN_RST 6       // Display reset Arduino pin number
-// #define RST_PORT 1 //PORTD  // Display reset port
-// #define RST_BIT 1 //PORTD7  // Display reset physical bit number
+    // Macros for setting the display control signals
+    #define RD_IDLE       digitalWrite(PIN_DISP_RD, HIGH)
+    #define RD_ACTIVE     digitalWrite(PIN_DISP_RD, LOW)
+    // #define WR_IDLE       digitalWrite(PIN_DISP_WR, HIGH)
+    #define WR_IDLE       (REG_PORT_OUTSET0 = 0x4000)
+    // #define WR_ACTIVE     digitalWrite(PIN_DISP_WR, LOW)
+    #define WR_ACTIVE     (REG_PORT_OUTCLR0 = 0x4000)
+    #define CD_COMMAND    digitalWrite(PIN_DISP_CD, LOW)
+    // #define CD_COMMAND    (REG_PORT_OUTCLR0 = (1 << 6))
+    #define CD_DATA       digitalWrite(PIN_DISP_CD, HIGH)
+    // #define CD_DATA       (REG_PORT_OUTSET0 = (1 << 6))
+    // #define CS_IDLE       digitalWrite(PIN_DISP_CS, HIGH)
+    #define CS_IDLE       (REG_PORT_OUTSET0 = 0x1000)
+    // #define CS_ACTIVE     digitalWrite(PIN_DISP_CS, LOW)
+    #define CS_ACTIVE     (REG_PORT_OUTCLR0 = 0x1000)
 
-// #define SPI_MOSI_PORT 0 //PORTB
-// #define SPI_MOSI_BIT 0 //PORTB2
+    #define CS_WR_ACTIVE    (REG_PORT_OUTCLR0 = 0x5000)
+    #define CS_WR_IDLE      (REG_PORT_OUTSET0 = 0x5000)
 
-// #define PIN_SCK 9
-#define PIN_SCK 0
-// #define SPI_SCK_PORT 0 //PORTB
-// #define SPI_SCK_BIT 0 //PORTB1
-
-#define RED_LED 10   /**< The pin number for the red color in the RGB LED. */
-#define GREEN_LED 11 /**< The pin number for the greem color in the RGB LED. */
-#define BLUE_LED 9   /**< The pin number for the blue color in the RGB LED. */
-
-#define RED_LED_PORT 0 //PORTB
-#define RED_LED_BIT 0 //PORTB6
-
-#define GREEN_LED_PORT 0 //PORTB
-#define GREEN_LED_BIT 0 //PORTB7
-
-#define BLUE_LED_PORT 0 //PORTB
-#define BLUE_LED_BIT 0 //PORTB5
+    // RGB LED
+    // #define RED_LED 25   /**< The pin number for the red color in the RGB LED. */
+    // #define GREEN_LED 26 /**< The pin number for the greem color in the RGB LED. */
+    // #define BLUE_LED 28   /**< The pin number for the blue color in the RGB LED. */
+    #define PIN_NEOPIXEL D8
 
 // bit values for button states
 // these are determined by the buttonsState() function
-#define LEFT_BUTTON 0b00100000  /**< The Left button value for functions requiring a bitmask */
-#define RIGHT_BUTTON 0b01000000 /**< The Right button value for functions requiring a bitmask */
-#define UP_BUTTON 0b10000000    /**< The Up button value for functions requiring a bitmask */
-#define DOWN_BUTTON 0b00010000  /**< The Down button value for functions requiring a bitmask */
-#define A_BUTTON 0b00001000     /**< The A button value for functions requiring a bitmask */
-#define B_BUTTON 0b00000100     /**< The B button value for functions requiring a bitmask */
-#define X_BUTTON 0b00000010
-#define Y_BUTTON 0b00000001
-#define SEL_BUTTON 0b00010000
+#define A_BUTTON        0b00001000     /**< The A button value for functions requiring a bitmask */
+#define B_BUTTON        0b00000100     /**< The B button value for functions requiring a bitmask */
+#define X_BUTTON        0b00000010
+#define Y_BUTTON        0b00000001
+#define SEL_BUTTON      0b00010000
 
-//Button pins
-//#define PIN_LEFT_BUTTON A2
-//#define PIN_RIGHT_BUTTON A1
-//#define PIN_UP_BUTTON A0
-//#define PIN_DOWN_BUTTON A3
-#define PIN_A_BUTTON 0
-#define PIN_B_BUTTON 1
-#define PIN_X_BUTTON 2
-#define PIN_Y_BUTTON 3
-#define PIN_JOY_SEL_BUTTON 4
+    //Button pins
+    #define PIN_A_BUTTON 1
+    #define PIN_B_BUTTON 0
+    #define PIN_X_BUTTON 22
+    #define PIN_Y_BUTTON 23
 
-//Joystick
-#define PIN_JOY_X_AXIS A6
-#define PIN_JOY_Y_AXIS A5
+    //Joystick
+    #define PIN_JOY_X_AXIS A4
+    #define PIN_JOY_Y_AXIS A1
+    #define JOY_X_THRESHOLD_LOW 2000
+    #define JOY_Y_THRESHOLD_LOW 2020
+    #define JOY_X_THRESHOLD_HIGH 2080
+    #define JOY_Y_THRESHOLD_HIGH 2060
+    #define JOY_X_THRESHOLD_SCALED_LOW -3
+    #define JOY_Y_THRESHOLD_SCALED_LOW -2
+    #define JOY_X_THRESHOLD_SCALED_HIGH 0
+    #define JOY_Y_THRESHOLD_SCALED_HIGH 0 //Maybe 1
+    #define JOY_ANALOG_RESOLUTION 10
 
+    // Backlight
+    #define PIN_BACKLIGHT A3
 
-#define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
-#define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
+    #define PIN_SPEAKER_1 5  /**< The pin number of the first lead of the speaker */
+    #define PIN_SPEAKER_2 13 /**< The pin number of the second lead of the speaker */
 
-#define SPEAKER_1_PORT 0 //PORTC
-#define SPEAKER_1_DDR 0 //DDRC
-#define SPEAKER_1_BIT 0 //PORTC6
+    #define SPEAKER_1_PORT 0 //PORTC
+    #define SPEAKER_1_DDR 0 //DDRC
+    #define SPEAKER_1_BIT 0 //PORTC6
 
-#define SPEAKER_2_PORT 0 //PORTC
-#define SPEAKER_2_DDR 0 //DDRC
-#define SPEAKER_2_BIT 0 //PORTC7
+    #define SPEAKER_2_PORT 0 //PORTC
+    #define SPEAKER_2_DDR 0 //DDRC
+    #define SPEAKER_2_BIT 0 //PORTC7
 
-#define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
-#define RAND_SEED_IN_PORTF
-#define RAND_SEED_IN_BIT 0 //PORTF1
-// Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
-#define RAND_SEED_IN_ADMUX ((1 << REFS0) | (1 << REFS1) | (1 << MUX0))
+    #define RAND_SEED_IN A4 // Open analog input used for noise by initRandomSeed()
+    #define RAND_SEED_IN_PORTF
+    #define RAND_SEED_IN_BIT 0 //PORTF1
+    // Value for ADMUX to read the random seed pin: 2.56V reference, ADC1
+    #define RAND_SEED_IN_ADMUX ((1 << REFS0) | (1 << REFS1) | (1 << MUX0))
+
+    #define SCREEN_WIDTH 320 /**< The width of the display in pixels */
+    #define SCREEN_HEIGHT 240 /**< The height of the display in pixels */
+
+    #define SCREEN_BUF_SIZE (2 * SCREEN_WIDTH * SCREEN_HEIGHT)
+
 // -----------------------
 
 // ----- Arduboy 1.0 pins -----
@@ -405,10 +427,6 @@
 
 // #define SCREEN_WIDTH 240 /**< The width of the display in pixels */
 // #define SCREEN_HEIGHT 320 /**< The height of the display in pixels */
-#define SCREEN_WIDTH 320 /**< The width of the display in pixels */
-#define SCREEN_HEIGHT 240 /**< The height of the display in pixels */
-
-#define SCREEN_BUF_SIZE (2 * SCREEN_WIDTH * SCREEN_HEIGHT)
 
 
 /** \brief
@@ -637,7 +655,7 @@ class ArduboyAdvanceCore
      *
      * \see paint8Pixels()
      */
-    void static paintScreen(uint8_t image[], bool clear = false);
+    volatile void static paintScreen(uint8_t image[], bool clear = false);
 
     /** \brief
      * Blank the display screen by setting all pixels off.

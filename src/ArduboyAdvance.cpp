@@ -65,7 +65,7 @@ void ArduboyAdvanceBase::flashlight()
   }
 
   sendLCDCommand(OLED_ALL_PIXELS_ON); // smaller than allPixelsOn()
-  digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
+//   digitalWriteRGB(RGB_ON, RGB_ON, RGB_ON);
 
   // prevent the bootloader magic number from being overwritten by timer 0
   // when a timer variable overlaps the magic number location, for when
@@ -80,24 +80,24 @@ void ArduboyAdvanceBase::flashlight()
 void ArduboyAdvanceBase::systemButtons()
 {
   while (pressed(SEL_BUTTON)) {
-    digitalWriteRGB(BLUE_LED, RGB_ON); // turn on blue LED
-    sysCtrlSound(Y_BUTTON + SEL_BUTTON, GREEN_LED, 0xff);
-    sysCtrlSound(A_BUTTON + SEL_BUTTON, RED_LED, 0);
+    // digitalWriteRGB(BLUE_LED, RGB_ON); // turn on blue LED
+    // sysCtrlSound(Y_BUTTON + SEL_BUTTON, GREEN_LED, 0xff);
+    // sysCtrlSound(A_BUTTON + SEL_BUTTON, RED_LED, 0);
     delayShort(200);
   }
 
-  digitalWriteRGB(BLUE_LED, RGB_OFF); // turn off blue LED
+//   digitalWriteRGB(BLUE_LED, RGB_OFF); // turn off blue LED
 }
 
 void ArduboyAdvanceBase::sysCtrlSound(uint8_t buttons, uint8_t led, uint8_t eeVal)
 {
   if (pressed(buttons)) {
-    digitalWriteRGB(BLUE_LED, RGB_OFF); // turn off blue LED
+    // digitalWriteRGB(BLUE_LED, RGB_OFF); // turn off blue LED
     delayShort(200);
-    digitalWriteRGB(led, RGB_ON); // turn on "acknowledge" LED
+    // digitalWriteRGB(led, RGB_ON); // turn on "acknowledge" LED
     // EEPROM.update(EEPROM_AUDIO_ON_OFF, eeVal);
     delayShort(500);
-    digitalWriteRGB(led, RGB_OFF); // turn off "acknowledge" LED
+    // digitalWriteRGB(led, RGB_OFF); // turn off "acknowledge" LED
 
     while (pressed(buttons)) { } // Wait for button release
   }
@@ -156,20 +156,20 @@ void ArduboyAdvanceBase::drawLogoSpritesOverwrite(int16_t y)
 // if changes are made to one, equivalent changes should be made to the other
 void ArduboyAdvanceBase::bootLogoShell(void (*drawLogo)(int16_t))
 {
-    digitalWriteRGB(RED_LED, RGB_ON);
+    // digitalWriteRGB(RED_LED, RGB_ON);
 
     for (int16_t y = -18; y <= 24; y++) {
         if (pressed(X_BUTTON)) {
-            digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
+            // digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
             return;
         }
 
         if (y == -4) {
-            digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
-            digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
+            // digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
+            // digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
         } else if (y == 24) {
-            digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
-            digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
+            // digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
+            // digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
         }
 
         (*drawLogo)(y); // call the function that actually draws the logo
@@ -183,7 +183,7 @@ void ArduboyAdvanceBase::bootLogoShell(void (*drawLogo)(int16_t))
     }
 
     delayShort(700);
-    digitalWriteRGB(BLUE_LED, RGB_OFF);
+    // digitalWriteRGB(BLUE_LED, RGB_OFF);
 
     bootLogoExtra();
 }
@@ -247,10 +247,11 @@ bool ArduboyAdvanceBase::nextFrameDEV()
   bool ret = nextFrame();
 
   if (ret) {
-    if (lastFrameDurationMs > eachFrameMillis)
-        digitalWriteRGB(RED_LED, RGB_ON);    // red LED on
-    else
-        digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
+    if (lastFrameDurationMs > eachFrameMillis) {
+        // digitalWriteRGB(RED_LED, RGB_ON);    // red LED on
+    } else {
+        // digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
+    }
   }
   return ret;
 }
@@ -1053,23 +1054,23 @@ ArduboyAdvance::ArduboyAdvance()
 // if changes are made to one, equivalent changes should be made to the other
 void ArduboyAdvance::bootLogoText()
 {
-    digitalWriteRGB(RED_LED, RGB_ON);
+    // digitalWriteRGB(RED_LED, RGB_ON);
 
     textSize = 2;
 
     for (int8_t y = -18; y <= 24; y++) {
         if (pressed(X_BUTTON)) {
-            digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
+            // digitalWriteRGB(RGB_OFF, RGB_OFF, RGB_OFF); // all LEDs off
             textSize = 1;
         return;
         }
 
         if (y == -4) {
-            digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
-            digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
+            // digitalWriteRGB(RED_LED, RGB_OFF);    // red LED off
+            // digitalWriteRGB(GREEN_LED, RGB_ON);   // green LED on
         } else if (y == 24) {
-            digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
-            digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
+            // digitalWriteRGB(GREEN_LED, RGB_OFF);  // green LED off
+            // digitalWriteRGB(BLUE_LED, RGB_ON);    // blue LED on
         }
 
         cursor_x = 23;
@@ -1085,7 +1086,7 @@ void ArduboyAdvance::bootLogoText()
     }
 
     delayShort(700);
-    digitalWriteRGB(BLUE_LED, RGB_OFF);
+    // digitalWriteRGB(BLUE_LED, RGB_OFF);
     textSize = 1;
 
     bootLogoExtra();
